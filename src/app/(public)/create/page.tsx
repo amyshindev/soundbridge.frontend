@@ -6,7 +6,7 @@ import { FilterPanel } from '@/components/create/FilterPanel';
 import { SamplePanel } from '@/components/create/SamplePanel';
 import { CreateFilter } from '@/types/api';
 import { Sample } from '@/types/sample';
-import { apiFetch } from '@/lib/api';
+import { listSamples } from '@/lib/api';
 
 const CreateContent = () => {
   const { preset, hasPreset } = useCreatePreset();
@@ -49,7 +49,7 @@ const CreateContent = () => {
       setIsLoading(true);
       try {
         // In real backend, we would pass query params here
-        const data = await apiFetch<Sample[]>('/create/samples');
+        const data = await listSamples();
         setRawSamples(data);
       } catch (e) {
         console.error('Failed to fetch samples', e);

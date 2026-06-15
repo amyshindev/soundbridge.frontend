@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { SearchBar } from '@/components/discover/SearchBar';
 import { SuggestionChips } from '@/components/discover/SuggestionChips';
 import { ResultCard } from '@/components/discover/ResultCard';
-import { apiFetch } from '@/lib/api';
+import { getPopularTracks } from '@/lib/api';
 import { GugakTrack } from '@/types/track';
 import { Play, ArrowRight, AudioLines, Infinity, Sliders, Heart } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export const revalidate = 3600; // Cache for 1 hour
 export default async function Home() {
   let popularTracks: GugakTrack[] = [];
   try {
-    popularTracks = await apiFetch<GugakTrack[]>('/discover/popular');
+    popularTracks = await getPopularTracks();
   } catch (error) {
     console.error('Failed to load popular tracks in server component', error);
   }
@@ -53,7 +53,9 @@ export default async function Home() {
 
         {/* Search Bar Container */}
         <div className="w-full flex justify-center mb-4 z-10">
-          <SearchBar />
+          <Suspense fallback={<div className="h-12 w-full max-w-xl rounded-lg bg-sb-surface animate-pulse" />}>
+            <SearchBar />
+          </Suspense>
         </div>
 
         {/* Suggestion Chips */}

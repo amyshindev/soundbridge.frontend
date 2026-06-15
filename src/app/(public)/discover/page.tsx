@@ -6,7 +6,7 @@ import { SearchBar } from '@/components/discover/SearchBar';
 import { ResultCard } from '@/components/discover/ResultCard';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { GhostButton } from '@/components/common/GhostButton';
-import { apiFetch } from '@/lib/api';
+import { discoverTracks, getPopularTracks } from '@/lib/api';
 import { MatchResult, GugakTrack } from '@/types/track';
 import { Search, Info } from 'lucide-react';
 
@@ -27,7 +27,7 @@ const DiscoverContent = () => {
         // Fetch popular tracks for fallback view
         try {
           setIsLoading(true);
-          const popular = await apiFetch<GugakTrack[]>('/discover/popular');
+          const popular = await getPopularTracks();
           setPopularTracks(popular);
         } catch (e) {
           console.error(e);
@@ -39,11 +39,7 @@ const DiscoverContent = () => {
 
       setIsLoading(true);
       try {
-        const payload = { input: query, lang: 'ko' };
-        const data = await apiFetch<MatchResult[]>('/discover', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
+        const data = await discoverTracks(query, 'ko');
         setResults(data);
       } catch (e) {
         console.error('Search failed', e);
