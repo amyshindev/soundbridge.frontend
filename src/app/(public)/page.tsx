@@ -12,7 +12,8 @@ export const revalidate = 3600; // Cache for 1 hour
 export default async function Home() {
   let popularTracks: GugakTrack[] = [];
   try {
-    popularTracks = await getPopularTracks();
+    const result = await getPopularTracks();
+    popularTracks = result.tracks;
   } catch (error) {
     console.error('Failed to load popular tracks in server component', error);
   }

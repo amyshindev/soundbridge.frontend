@@ -3,6 +3,7 @@ import { BridgeButton } from '../common/BridgeButton';
 import { buildCreatePresetUrl } from '@/lib/presetUrl';
 
 export interface CreateBridgeButtonProps {
+  presetUrl?: string;
   instrument?: string;
   emotion?: string;
   bpm?: number;
@@ -12,6 +13,7 @@ export interface CreateBridgeButtonProps {
 }
 
 export const CreateBridgeButton = ({
+  presetUrl,
   instrument,
   emotion,
   bpm,
@@ -19,7 +21,7 @@ export const CreateBridgeButton = ({
   fullWidth = false,
   className = '',
 }: CreateBridgeButtonProps) => {
-  const href = buildCreatePresetUrl({ instrument, emotion, bpm });
+  const href = presetUrl ?? buildCreatePresetUrl({ instrument, emotion, bpm });
 
   return (
     <BridgeButton href={href} fullWidth={fullWidth} className={className}>

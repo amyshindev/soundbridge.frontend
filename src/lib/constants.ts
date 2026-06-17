@@ -54,3 +54,9 @@ export const LOOP_UNIT_OPTIONS = [
 export const INSTRUMENTS = ['장구', '가야금', '대금', '해금', '거문고', '피리', '아쟁', '소금'] as const;
 export const JANGDANS = ['자진모리', '중모리', '굿거리', '휘모리', '세마치', '엇모리'] as const;
 export const EMOTIONS = ['신남', '서정', '웅장', '슬픔', '신비', '차분'] as const;
+
+/** 백엔드 license 쿼리: KOGL_1(상업가능) / KOGL_2(출처표시) */
+export const LICENSE_API_MAP = {
+  commercial: 'KOGL_1',
+  attribution: 'KOGL_2',
+} as const;

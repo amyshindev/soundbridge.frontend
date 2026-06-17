@@ -1,8 +1,23 @@
 import { GugakTrack, MatchResult } from '@/types/track';
 import { Sample } from '@/types/sample';
+import {
+  CreateFilter,
+  DataSource,
+  DiscoverResult,
+  PopularTracksResult,
+  SampleFilters,
+  SampleListResult,
+} from '@/types/api';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const API_PREFIX = '/api/soundbridge';
+
+/** dev 또는 NEXT_PUBLIC_USE_MOCK=true 일 때만 mock fallback */
+export function shouldUseMockFallback(): boolean {
+  if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return true;
+  if (process.env.NEXT_PUBLIC_USE_MOCK === 'false') return false;
+  return process.env.NODE_ENV === 'development';
+}
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -98,6 +113,69 @@ function mapDiscoverResults(data: ApiDiscoverResponse): MatchResult[] {
   }));
 }
 
+export function createFilterToSampleFilters(filters: CreateFilter): SampleFilters {
+  const sampleFilters: SampleFilters = {
+    limit: 100,
+    offset: 0,
+  };
+
+  if (filters.instruments.length > 0) {
+    sampleFilters.instruments = filters.instruments;
+  }
+  if (filters.jangdans.length > 0) {
+    sampleFilters.jangdans = filters.jangdans;
+  }
+  if (filters.emotions.length > 0) {
+    sampleFilters.emotions = filters.emotions;
+  }
+  if (filters.bpmMin !== 60) {
+    sampleFilters.bpmMin = filters.bpmMin;
+  }
+  if (filters.bpmMax !== 200) {
+    sampleFilters.bpmMax = filters.bpmMax;
+  }
+  if (filters.loopUnit !== null) {
+    sampleFilters.loopUnit = filters.loopUnit;
+  }
+  if (filters.license !== 'all') {
+    sampleFilters.license = filters.license;
+  }
+
+  return sampleFilters;
+}
+
+export function buildSampleQueryString(filters: SampleFilters): string {
+  const params = new URLSearchParams();
+
+  filters.instruments?.forEach((value) => params.append('instruments', value));
+  filters.jangdans?.forEach((value) => params.append('jangdans', value));
+  filters.emotions?.forEach((value) => params.append('emotions', value));
+
+  if (filters.bpmMin !== undefined) {
+    params.set('bpm_min', String(filters.bpmMin));
+  }
+  if (filters.bpmMax !== undefined) {
+    params.set('bpm_max', String(filters.bpmMax));
+  }
+  if (filters.loopUnit !== null && filters.loopUnit !== undefined) {
+    params.set('loop_unit', String(filters.loopUnit));
+  }
+  if (filters.license === 'commercial') {
+    params.set('license', 'KOGL_1');
+  } else if (filters.license === 'attribution') {
+    params.set('license', 'KOGL_2');
+  }
+  if (filters.limit !== undefined) {
+    params.set('limit', String(filters.limit));
+  }
+  if (filters.offset !== undefined) {
+    params.set('offset', String(filters.offset));
+  }
+
+  const query = params.toString();
+  return query ? `?${query}` : '';
+}
+
 async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const { token, ...rest } = options;
 
@@ -118,17 +196,24 @@ async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   return res.json();
 }
 
-async function withMockFallback<T>(path: string, request: () => Promise<T>, fallback: () => T): Promise<T> {
+async function withMockFallback<T>(
+  path: string,
+  request: () => Promise<T>,
+  fallback: () => T,
+): Promise<{ data: T; source: DataSource }> {
   try {
-    return await request();
+    return { data: await request(), source: 'api' };
   } catch (e) {
+    if (!shouldUseMockFallback()) {
+      throw e;
+    }
     console.warn(`API fetch failed for ${API_PREFIX}${path}. Falling back to mock data.`, e);
-    return fallback();
+    return { data: fallback(), source: 'mock' };
   }
 }
 
-export async function getPopularTracks(limit = 6): Promise<GugakTrack[]> {
-  return withMockFallback(
+export async function getPopularTracks(limit = 6): Promise<PopularTracksResult> {
+  const { data, source } = await withMockFallback(
     `/discover/popular?limit=${limit}`,
     async () => {
       const tracks = await apiFetch<ApiTrack[]>(`/discover/popular?limit=${limit}`);
@@ -136,31 +221,91 @@ export async function getPopularTracks(limit = 6): Promise<GugakTrack[]> {
     },
     () => MOCK_TRACKS.slice(0, limit),
   );
+  return { tracks: data, source };
 }
 
-export async function discoverTracks(input: string, lang = 'ko'): Promise<MatchResult[]> {
-  return withMockFallback(
-    '/discover',
-    async () => {
-      const data = await apiFetch<ApiDiscoverResponse>('/discover', {
-        method: 'POST',
-        body: JSON.stringify({ input, lang }),
-      });
-      return mapDiscoverResults(data);
-    },
-    () => getMockDiscoverResults(input),
-  );
+export async function discoverTracks(input: string, lang = 'ko'): Promise<DiscoverResult> {
+  try {
+    const data = await apiFetch<ApiDiscoverResponse>('/discover', {
+      method: 'POST',
+      body: JSON.stringify({ input, lang }),
+    });
+    return {
+      tracks: mapDiscoverResults(data),
+      inputSummary: data.input_summary,
+      source: 'api',
+    };
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 503) {
+      throw e;
+    }
+    if (!shouldUseMockFallback()) {
+      throw e;
+    }
+    console.warn(`API fetch failed for ${API_PREFIX}/discover. Falling back to mock data.`, e);
+    return {
+      tracks: getMockDiscoverResults(input),
+      inputSummary: `"${input}" 와 감성이 닮은 국악`,
+      source: 'mock',
+    };
+  }
 }
 
-export async function listSamples(): Promise<Sample[]> {
-  return withMockFallback(
-    '/create/samples',
+export async function listSamples(filters: SampleFilters = {}): Promise<SampleListResult> {
+  const query = buildSampleQueryString({ limit: 100, offset: 0, ...filters });
+  const { data, source } = await withMockFallback(
+    `/create/samples${query}`,
     async () => {
-      const data = await apiFetch<ApiSampleListResponse>('/create/samples');
-      return data.tracks.map(mapSample);
+      const response = await apiFetch<ApiSampleListResponse>(`/create/samples${query}`);
+      return {
+        tracks: response.tracks.map(mapSample),
+        total: response.total,
+      };
     },
-    () => MOCK_SAMPLES,
+    () => ({
+      tracks: filterMockSamples(filters),
+      total: filterMockSamples(filters).length,
+    }),
   );
+  return { ...data, source };
+}
+
+function filterMockSamples(filters: SampleFilters): Sample[] {
+  const createFilter: CreateFilter = {
+    instruments: filters.instruments ?? [],
+    jangdans: filters.jangdans ?? [],
+    emotions: filters.emotions ?? [],
+    bpmMin: filters.bpmMin ?? 60,
+    bpmMax: filters.bpmMax ?? 200,
+    loopUnit: filters.loopUnit ?? null,
+    license: filters.license ?? 'all',
+  };
+
+  return MOCK_SAMPLES.filter((sample) => {
+    if (createFilter.instruments.length > 0 && !createFilter.instruments.includes(sample.instrument)) {
+      return false;
+    }
+    if (createFilter.jangdans.length > 0 && !createFilter.jangdans.includes(sample.jangdan)) {
+      return false;
+    }
+    if (createFilter.emotions.length > 0) {
+      const hasOverlap = sample.emotionTags.some((tag) => createFilter.emotions.includes(tag));
+      if (!hasOverlap) return false;
+    }
+    if (sample.bpm < createFilter.bpmMin || sample.bpm > createFilter.bpmMax) {
+      return false;
+    }
+    if (createFilter.loopUnit !== null && sample.loopUnitBeats !== createFilter.loopUnit) {
+      return false;
+    }
+    if (createFilter.license === 'commercial' && sample.publicLicenseType !== 'KOGL_1') {
+      return false;
+    }
+    if (createFilter.license === 'attribution' && sample.publicLicenseType !== 'KOGL_2') {
+      return false;
+    }
+    return true;
+  });
 }
 
 // ==========================================

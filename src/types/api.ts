@@ -9,6 +9,8 @@ export interface ApiError {
   code?: string;
 }
 
+export type DataSource = 'api' | 'mock';
+
 // [v4.0] loopUnit: number | null 로 변경
 //   number: 백엔드 loop_unit 쿼리 파라미터로 그대로 전달 (예: 12, 6, 4)
 //   null: 전체 (파라미터 생략)
@@ -21,4 +23,34 @@ export interface CreateFilter {
   bpmMax: number;
   loopUnit: number | null; // number | null
   license: 'commercial' | 'attribution' | 'all';
+}
+
+/** CREATE API 쿼리 파라미터 (서버 필터링) */
+export interface SampleFilters {
+  instruments?: string[];
+  jangdans?: string[];
+  emotions?: string[];
+  bpmMin?: number;
+  bpmMax?: number;
+  loopUnit?: number | null;
+  license?: 'commercial' | 'attribution' | 'all';
+  limit?: number;
+  offset?: number;
+}
+
+export interface SampleListResult {
+  tracks: import('./sample').Sample[];
+  total: number;
+  source: DataSource;
+}
+
+export interface DiscoverResult {
+  tracks: import('./track').MatchResult[];
+  inputSummary: string;
+  source: DataSource;
+}
+
+export interface PopularTracksResult {
+  tracks: import('./track').GugakTrack[];
+  source: DataSource;
 }

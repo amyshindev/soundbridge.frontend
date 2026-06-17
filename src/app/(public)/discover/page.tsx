@@ -6,11 +6,10 @@ import { SearchBar } from '@/components/discover/SearchBar';
 import { ResultCard } from '@/components/discover/ResultCard';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { GhostButton } from '@/components/common/GhostButton';
-import { discoverTracks, getPopularTracks } from '@/lib/api';
+import { discoverTracks, getPopularTracks, ApiError } from '@/lib/api';
 import { MatchResult, GugakTrack } from '@/types/track';
-import { Search, Info } from 'lucide-react';
+import { Search, Info, AlertTriangle } from 'lucide-react';
 
-// Inner component that uses searchParams
 const DiscoverContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -18,17 +17,20 @@ const DiscoverContent = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<MatchResult[]>([]);
+  const [inputSummary, setInputSummary] = useState('');
   const [popularTracks, setPopularTracks] = useState<GugakTrack[]>([]);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchResults = async () => {
       if (!query) {
         setResults([]);
-        // Fetch popular tracks for fallback view
+        setInputSummary('');
+        setSearchError(null);
         try {
           setIsLoading(true);
           const popular = await getPopularTracks();
-          setPopularTracks(popular);
+          setPopularTracks(popular.tracks);
         } catch (e) {
           console.error(e);
         } finally {
@@ -38,11 +40,19 @@ const DiscoverContent = () => {
       }
 
       setIsLoading(true);
+      setSearchError(null);
       try {
         const data = await discoverTracks(query, 'ko');
-        setResults(data);
+        setResults(data.tracks);
+        setInputSummary(data.inputSummary || `"${query}" 와 감성이 닮은 국악`);
       } catch (e) {
         console.error('Search failed', e);
+        setResults([]);
+        if (e instanceof ApiError && e.status === 503) {
+          setSearchError('AI 서비스가 일시적으로 이용 불가합니다. 잠시 후 다시 시도해 주세요.');
+        } else {
+          setSearchError('검색 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -55,16 +65,17 @@ const DiscoverContent = () => {
     router.push('/discover');
   };
 
+  const handleRetry = () => {
+    router.refresh();
+  };
+
   return (
     <div className="max-w-[1080px] mx-auto px-4 md:px-8 py-8 font-sans select-none">
-      {/* Search Bar at the top */}
       <div className="flex flex-col items-center gap-6 mb-8">
         <SearchBar initialValue={query} />
       </div>
 
-      {/* Conditional Rendering based on state */}
       {isLoading ? (
-        // Loading State
         <div className="flex flex-col items-center py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-8">
             <SkeletonCard />
@@ -77,13 +88,11 @@ const DiscoverContent = () => {
           </div>
         </div>
       ) : query ? (
-        // Search Results State
         <div>
-          {/* Summary Bar */}
           <div className="flex items-center justify-between border-b border-sb-border pb-3 mb-6">
             <div className="flex items-center gap-2">
               <span className="text-[14px] font-medium text-sb-primary">
-                &ldquo;{query}&rdquo; 와 감성이 닮은 국악
+                {inputSummary || `"${query}" 와 감성이 닮은 국악`}
               </span>
             </div>
             <GhostButton
@@ -94,8 +103,16 @@ const DiscoverContent = () => {
             </GhostButton>
           </div>
 
-          {results.length > 0 ? (
-            /* Results Grid */
+          {searchError ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <AlertTriangle className="w-10 h-10 text-sb-error mb-3" />
+              <h3 className="text-[15px] font-medium text-sb-primary mb-1">검색을 완료하지 못했어요</h3>
+              <p className="text-[12px] text-sb-muted max-w-[320px] mb-4">{searchError}</p>
+              <GhostButton onClick={handleRetry} className="text-[12px]">
+                다시 시도
+              </GhostButton>
+            </div>
+          ) : results.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {results.map((result) => (
                 <ResultCard
@@ -107,18 +124,17 @@ const DiscoverContent = () => {
               ))}
             </div>
           ) : (
-            /* Empty State */
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Search className="w-10 h-10 text-sb-muted mb-3" />
               <h3 className="text-[15px] font-medium text-sb-primary mb-1">검색 결과가 없어요</h3>
-              <p className="text-[12px] text-sb-muted max-w-[280px]">다른 분위기나 아티스트를 입력해 보세요.</p>
+              <p className="text-[12px] text-sb-muted max-w-[280px]">
+                DB에 임베딩이 없거나 조건에 맞는 트랙이 없을 수 있습니다. 다른 검색어를 시도해 보세요.
+              </p>
             </div>
           )}
         </div>
       ) : (
-        // Default Landing/Popular tracks State
         <div>
-          {/* Popular header */}
           <div className="flex items-center gap-2 border-b border-sb-border pb-3 mb-6 select-none">
             <Info className="w-4 h-4 text-sb-accent" />
             <span className="text-[14px] font-medium text-sb-primary">
@@ -137,7 +153,6 @@ const DiscoverContent = () => {
   );
 };
 
-// Root Component wrapped in Suspense for Next.js useSearchParams compliance
 export default function DiscoverPage() {
   return (
     <Suspense fallback={

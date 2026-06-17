@@ -8,6 +8,7 @@ import { SlidersHorizontal, AlertCircle } from 'lucide-react';
 
 export interface SamplePanelProps {
   samples: Sample[];
+  total?: number;
   isLoading: boolean;
   filtersSummaryText: string;
   onResetFilters: () => void;
@@ -15,10 +16,12 @@ export interface SamplePanelProps {
 
 export const SamplePanel = ({
   samples,
+  total,
   isLoading,
   filtersSummaryText,
   onResetFilters,
 }: SamplePanelProps) => {
+  const count = total ?? samples.length;
   return (
     <div className="flex-1 flex flex-col h-full bg-sb-bg font-sans select-none">
       {/* Top Summary Bar */}
@@ -30,7 +33,7 @@ export const SamplePanel = ({
           </span>
         </div>
         <span className="text-[12px] text-sb-primary font-medium shrink-0 ml-4 font-mono">
-          {samples.length}개 샘플
+          {count}개 샘플
         </span>
       </div>
 

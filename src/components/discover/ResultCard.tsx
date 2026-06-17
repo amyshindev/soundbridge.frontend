@@ -141,6 +141,7 @@ export const ResultCard = ({
         {/* Bridge Button */}
         <div className="mt-1.5 pt-2 border-t border-sb-border/50">
           <CreateBridgeButton
+            presetUrl={track.presetUrl}
             instrument={track.instrument}
             emotion={firstEmotion}
             bpm={track.bpm}
