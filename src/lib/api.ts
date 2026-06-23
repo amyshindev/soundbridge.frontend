@@ -9,8 +9,23 @@ import {
   SampleListResult,
 } from '@/types/api';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const API_PREFIX = '/api/soundbridge';
+
+/** 브라우저: same-origin 프록시. SSR: Vercel URL 또는 API_URL. 로컬: NEXT_PUBLIC_API_URL 우선 */
+function getBaseUrl(): string {
+  const direct = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (direct) return direct;
+
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return (process.env.API_URL || 'http://localhost:8000').replace(/\/$/, '');
+}
 
 /** dev 또는 NEXT_PUBLIC_USE_MOCK=true 일 때만 mock fallback */
 export function shouldUseMockFallback(): boolean {
@@ -179,7 +194,7 @@ export function buildSampleQueryString(filters: SampleFilters): string {
 async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const { token, ...rest } = options;
 
-  const res = await fetch(`${BASE_URL}${API_PREFIX}${path}`, {
+  const res = await fetch(`${getBaseUrl()}${API_PREFIX}${path}`, {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
