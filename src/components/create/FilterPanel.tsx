@@ -7,6 +7,8 @@ import { PresetBanner } from './PresetBanner';
 import { LoopUnitFilter } from './LoopUnitFilter';
 import { Chip } from '../common/Chip';
 import { INSTRUMENTS, JANGDANS, EMOTIONS, JANGDAN_LOOP_MAP } from '@/lib/constants';
+import { labelEmotion, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
+import { useLocale } from '@/context/LocaleContext';
 import { RotateCcw } from 'lucide-react';
 
 export interface FilterPanelProps {
@@ -24,6 +26,7 @@ export const FilterPanel = ({
   showPresetBanner,
   onClosePresetBanner,
 }: FilterPanelProps) => {
+  const { locale, t } = useLocale();
 
   const handleInstrumentToggle = (inst: string) => {
     const isSelected = filters.instruments.includes(inst);
@@ -120,13 +123,13 @@ export const FilterPanel = ({
         {/* Section: Instrument */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            악기
+            {t('create_filter_instrument')}
           </span>
           <div className="grid grid-cols-4 sm:grid-cols-4 gap-1.5">
             {INSTRUMENTS.map((inst) => (
               <Chip
                 key={inst}
-                label={inst}
+                label={labelInstrument(locale, inst)}
                 active={filters.instruments.includes(inst)}
                 onClick={() => handleInstrumentToggle(inst)}
                 className="py-1 text-[11px]"
@@ -138,13 +141,13 @@ export const FilterPanel = ({
         {/* Section: Jangdan */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            장단
+            {t('create_filter_jangdan')}
           </span>
           <div className="grid grid-cols-3 gap-1.5">
             {JANGDANS.map((jd) => (
               <Chip
                 key={jd}
-                label={jd}
+                label={labelJangdan(locale, jd)}
                 active={filters.jangdans.includes(jd)}
                 onClick={() => handleJangdanToggle(jd)}
                 className="py-1 text-[11px]"
@@ -156,13 +159,13 @@ export const FilterPanel = ({
         {/* Section: Emotion */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            감성
+            {t('create_filter_emotion')}
           </span>
           <div className="grid grid-cols-3 gap-1.5">
             {EMOTIONS.map((em) => (
               <Chip
                 key={em}
-                label={em}
+                label={labelEmotion(locale, em)}
                 active={filters.emotions.includes(em)}
                 onClick={() => handleEmotionToggle(em)}
                 className="py-1 text-[11px]"
@@ -175,7 +178,7 @@ export const FilterPanel = ({
         <div className="flex flex-col gap-2.5">
           <div className="flex justify-between items-baseline">
             <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-              템포 (BPM)
+              {t('create_filter_bpm')}
             </span>
             <span className="text-[11px] text-sb-primary font-mono font-medium">
               {filters.bpmMin} — {filters.bpmMax} BPM
@@ -213,7 +216,7 @@ export const FilterPanel = ({
         {/* Section: Loop Unit */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            루프 단위
+            {t('create_filter_loop')}
           </span>
           <LoopUnitFilter value={filters.loopUnit} onChange={handleLoopUnitChange} />
         </div>
@@ -221,23 +224,23 @@ export const FilterPanel = ({
         {/* Section: License */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            라이선스
+            {t('create_filter_license')}
           </span>
           <div className="flex gap-1.5">
             <Chip
-              label="상업 가능"
+              label={t('create_license_commercial')}
               active={filters.license === 'commercial'}
               onClick={() => handleLicenseChange('commercial')}
               className="py-1 px-3 text-[11px]"
             />
             <Chip
-              label="출처 표시"
+              label={t('create_license_attribution')}
               active={filters.license === 'attribution'}
               onClick={() => handleLicenseChange('attribution')}
               className="py-1 px-3 text-[11px]"
             />
             <Chip
-              label="전체"
+              label={t('create_license_all')}
               active={filters.license === 'all'}
               onClick={() => handleLicenseChange('all')}
               className="py-1 px-3 text-[11px]"
@@ -253,7 +256,7 @@ export const FilterPanel = ({
           className="w-full flex items-center justify-center gap-1.5 text-sb-muted hover:text-sb-primary text-[12px] font-medium transition-colors py-2 rounded-lg hover:bg-sb-surface"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>선택된 필터 초기화</span>
+          <span>{t('create_reset_filters')}</span>
         </button>
       </div>
     </div>

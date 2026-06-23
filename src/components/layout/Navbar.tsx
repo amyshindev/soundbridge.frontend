@@ -7,9 +7,12 @@ import { Music, User } from 'lucide-react';
 import { clsx } from 'clsx';
 import { PrimaryButton } from '../common/PrimaryButton';
 import { GhostButton } from '../common/GhostButton';
+import { LanguageToggle } from '../common/LanguageToggle';
+import { useLocale } from '@/context/LocaleContext';
 
 export const Navbar = () => {
   const pathname = usePathname();
+  const { t } = useLocale();
 
   const isDiscoverActive = pathname.startsWith('/discover');
   const isCreateActive = pathname === '/create';
@@ -50,27 +53,27 @@ export const Navbar = () => {
 
       {/* Right Area - Language & Auth Actions */}
       <div className="flex items-center gap-2">
-        {/* Language Toggle (KO/EN UI only for MVP) */}
-        <GhostButton className="px-2.5 py-1 text-[11px] font-medium border-transparent hover:bg-sb-surface">
-          KO | EN
-        </GhostButton>
+        <LanguageToggle />
 
         {/* Auth Buttons for Desktop */}
         <div className="hidden md:flex items-center gap-2">
           <Link href="/auth/login">
             <GhostButton className="px-3.5 py-[5px] text-[12px] font-medium">
-              로그인
+              {t('nav_login')}
             </GhostButton>
           </Link>
           <Link href="/auth/signup">
             <PrimaryButton className="px-4 py-[6px] text-[12px] font-medium">
-              회원가입
+              {t('nav_signup')}
             </PrimaryButton>
           </Link>
         </div>
 
         {/* User Icon for Mobile (redirects to login in MVP) */}
-        <Link href="/auth/login" className="flex md:hidden items-center justify-center p-2 text-sb-primary hover:bg-sb-surface rounded-lg transition-colors">
+        <Link
+          href="/auth/login"
+          className="flex md:hidden items-center justify-center p-2 text-sb-primary hover:bg-sb-surface rounded-lg transition-colors"
+        >
           <User className="w-4 h-4" />
         </Link>
       </div>

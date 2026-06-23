@@ -2,14 +2,15 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ToastProvider } from '@/components/common/ToastProvider';
 import { PlayerProvider } from '@/context/PlayerContext';
+import { LocaleProvider } from '@/context/LocaleContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PlayerBar } from '@/components/layout/PlayerBar';
 import { BottomTabBar } from '@/components/layout/BottomTabBar';
 
 export const metadata: Metadata = {
-  title: 'SoundBridge (사운드브릿지) — 당신의 음악 언어로 국악을 만나세요',
-  description: '사용자가 좋아하는 음악의 감성을 AI가 분석하여 가장 닮은 전통 국악과 샘플 라이브러리를 연결해 드립니다.',
+  title: 'SoundBridge (사운드브릿지) — 내 플리에 국악 한 스푼.',
+  description: '좋아하는 음악의 감성으로 어울리는 국악을 찾고, 샘플 라이브러리로 나만의 사운드를 만들어 보세요.',
 };
 
 export default function RootLayout({
@@ -24,7 +25,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-sb-bg text-sb-primary antialiased font-sans">
         <ToastProvider>
-          <PlayerProvider>
+          <LocaleProvider>
+            <PlayerProvider>
             {/* GNB */}
             <Navbar />
 
@@ -41,7 +43,8 @@ export default function RootLayout({
 
             {/* Mobile Bottom Tabbar */}
             <BottomTabBar />
-          </PlayerProvider>
+            </PlayerProvider>
+          </LocaleProvider>
         </ToastProvider>
       </body>
     </html>

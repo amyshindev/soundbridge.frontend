@@ -6,9 +6,11 @@ import { usePathname } from 'next/navigation';
 import { usePlayer } from '@/hooks/usePlayer';
 import { Music, SlidersHorizontal, Heart } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useLocale } from '@/context/LocaleContext';
 
 export const BottomTabBar = () => {
   const pathname = usePathname();
+  const { t } = useLocale();
   const { currentTrack } = usePlayer();
 
   // If PlayerBar is active, hide the tabbar on mobile
@@ -64,7 +66,7 @@ export const BottomTabBar = () => {
           )}
         />
         {isSaved && (
-          <span className="text-[10px] font-medium text-sb-primary">저장</span>
+          <span className="text-[10px] font-medium text-sb-primary">{t('tab_saved')}</span>
         )}
       </Link>
     </div>

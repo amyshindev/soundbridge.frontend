@@ -10,6 +10,7 @@ import { WhyBox } from './WhyBox';
 import { EmotionTagChips } from './EmotionTagChips';
 import { CreateBridgeButton } from './CreateBridgeButton';
 import { GhostButton } from '../common/GhostButton';
+import { useLocale } from '@/context/LocaleContext';
 import { Music, Play, Pause, Heart, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -27,6 +28,7 @@ export const ResultCard = ({
   className = '',
 }: ResultCardProps) => {
   const router = useRouter();
+  const { t } = useLocale();
   const { currentTrack, isPlaying, play, pause } = usePlayer();
 
   const isCurrentTrack = currentTrack?.id === track.id;
@@ -73,7 +75,7 @@ export const ResultCard = ({
         <button
           onClick={handleHeartClick}
           className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-sb-border/40 text-sb-muted hover:text-sb-error transition-colors"
-          title="저장하기 (로그인 필요)"
+          title={t('result_save_title')}
         >
           <Heart className="w-4 h-4" />
         </button>
@@ -126,14 +128,14 @@ export const ResultCard = ({
             onClick={() => router.push('/auth/login')}
             className="flex-1 py-1 text-[11px] font-medium flex items-center justify-center gap-1 border-sb-border/50 text-sb-muted hover:text-sb-primary"
           >
-            <span>공연 보기</span>
+            <span>{t('result_show_performance')}</span>
             <ExternalLink className="w-3 h-3 text-sb-muted/60" />
           </GhostButton>
           <GhostButton
             onClick={() => router.push('/auth/login')}
             className="flex-1 py-1 text-[11px] font-medium flex items-center justify-center gap-1 border-sb-border/50 text-sb-muted hover:text-sb-primary"
           >
-            <span>체험 찾기</span>
+            <span>{t('result_find_experience')}</span>
             <ExternalLink className="w-3 h-3 text-sb-muted/60" />
           </GhostButton>
         </div>
@@ -146,7 +148,7 @@ export const ResultCard = ({
             emotion={firstEmotion}
             bpm={track.bpm}
             fullWidth
-            label="이 분위기로 만들기"
+            label={t('result_create_bridge')}
           />
         </div>
       </div>

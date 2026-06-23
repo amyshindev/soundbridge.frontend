@@ -4,6 +4,7 @@ import React from 'react';
 import { Sample } from '@/types/sample';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useToast } from '@/hooks/useToast';
+import { useLocale } from '@/context/LocaleContext';
 import { MiniWaveform } from './MiniWaveform';
 import { LoopBadge } from './LoopBadge';
 import { LicenseBadge } from './LicenseBadge';
@@ -16,6 +17,7 @@ export interface SampleRowProps {
 export const SampleRow = ({ sample }: SampleRowProps) => {
   const { currentTrack, isPlaying, play, pause } = usePlayer();
   const { showToast } = useToast();
+  const { t } = useLocale();
 
   const isCurrent = currentTrack?.id === sample.id;
   const isCurrentlyPlaying = isCurrent && isPlaying;
@@ -38,7 +40,7 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('다운로드가 시작되었습니다.', 'success');
+    showToast(t('sample_download_toast'), 'success');
   };
 
   return (

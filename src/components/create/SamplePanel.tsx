@@ -4,6 +4,7 @@ import React from 'react';
 import { Sample } from '@/types/sample';
 import { SampleRow } from './SampleRow';
 import { PrimaryButton } from '../common/PrimaryButton';
+import { useLocale } from '@/context/LocaleContext';
 import { SlidersHorizontal, AlertCircle } from 'lucide-react';
 
 export interface SamplePanelProps {
@@ -21,6 +22,7 @@ export const SamplePanel = ({
   filtersSummaryText,
   onResetFilters,
 }: SamplePanelProps) => {
+  const { t } = useLocale();
   const count = total ?? samples.length;
   return (
     <div className="flex-1 flex flex-col h-full bg-sb-bg font-sans select-none">
@@ -29,11 +31,11 @@ export const SamplePanel = ({
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <SlidersHorizontal className="w-4 h-4 text-sb-accent shrink-0" />
           <span className="text-[12.5px] text-sb-muted font-medium truncate" title={filtersSummaryText}>
-            {filtersSummaryText || '전체 검색 조건'}
+            {filtersSummaryText || t('create_summary_all')}
           </span>
         </div>
         <span className="text-[12px] text-sb-primary font-medium shrink-0 ml-4 font-mono">
-          {count}개 샘플
+          {t('create_sample_count', { count })}
         </span>
       </div>
 
@@ -58,13 +60,13 @@ export const SamplePanel = ({
           <div className="flex flex-col items-center justify-center text-center py-20 px-4">
             <AlertCircle className="w-10 h-10 text-sb-muted mb-3.5" />
             <h3 className="text-[15px] font-medium text-sb-primary mb-1">
-              조건에 맞는 샘플이 없어요
+              {t('create_empty_title')}
             </h3>
             <p className="text-[12px] text-sb-muted max-w-[280px] leading-relaxed mb-6">
-              필터 조건을 더 부드럽게 조절하거나 초기화하여 사운드를 탐색해 보세요.
+              {t('create_empty_desc')}
             </p>
             <PrimaryButton onClick={onResetFilters} className="px-5 py-2">
-              필터 초기화
+              {t('create_empty_reset')}
             </PrimaryButton>
           </div>
         )}
