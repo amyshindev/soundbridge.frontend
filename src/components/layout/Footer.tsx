@@ -13,6 +13,10 @@ export const Footer = () => {
 
         {/* Row 2 - Legal Links & Contact */}
         <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-4 gap-y-1 text-[12px] text-sb-muted font-normal">
+          <Link href="/about" className="hover:text-sb-primary transition-colors">
+            서비스 소개
+          </Link>
+          <span className="text-sb-border">|</span>
           <Link href="/terms" className="hover:text-sb-primary transition-colors">
             이용약관
           </Link>

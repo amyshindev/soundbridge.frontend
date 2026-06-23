@@ -75,7 +75,7 @@ export default async function Home() {
           </Link>
           
           <Link
-            href="/create"
+            href="/about"
             className="inline-flex items-center justify-center gap-1.5 bg-white border border-sb-border text-sb-primary px-5 py-2.5 rounded-lg text-[13px] font-medium shadow-sm hover:bg-[#F9F9F7] active:bg-sb-surface transition-colors"
           >
             <Play className="w-3.5 h-3.5 fill-sb-primary text-sb-primary" />

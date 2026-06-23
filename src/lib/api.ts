@@ -10,6 +10,9 @@ import {
 } from '@/types/api';
 
 const API_PREFIX = '/api/soundbridge';
+/** DISCOVER: 임베딩+DB는 보통 수 초, Gemini enrich 미사용 기준 */
+const DISCOVER_FETCH_TIMEOUT_MS = 30_000;
+const DEFAULT_FETCH_TIMEOUT_MS = 15_000;
 
 /** 브라우저: same-origin 프록시. SSR: Vercel URL 또는 API_URL. 로컬: NEXT_PUBLIC_API_URL 우선 */
 function getBaseUrl(): string {
@@ -42,6 +45,7 @@ export class ApiError extends Error {
 
 interface ApiOptions extends RequestInit {
   token?: string;
+  timeoutMs?: number;
 }
 
 interface ApiCuePoint {
@@ -192,23 +196,35 @@ export function buildSampleQueryString(filters: SampleFilters): string {
 }
 
 async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
-  const { token, ...rest } = options;
+  const { token, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS, ...rest } = options;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  const res = await fetch(`${getBaseUrl()}${API_PREFIX}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...rest.headers,
-    },
-  });
+  try {
+    const res = await fetch(`${getBaseUrl()}${API_PREFIX}${path}`, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...rest.headers,
+      },
+    });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, error.detail ?? error.message ?? 'Server error occurred');
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, error.detail ?? error.message ?? 'Server error occurred');
+    }
+
+    return res.json();
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') {
+      throw new ApiError(408, '요청 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.');
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return res.json();
 }
 
 async function withMockFallback<T>(
@@ -243,7 +259,8 @@ export async function discoverTracks(input: string, lang = 'ko'): Promise<Discov
   try {
     const data = await apiFetch<ApiDiscoverResponse>('/discover', {
       method: 'POST',
-      body: JSON.stringify({ input, lang }),
+      body: JSON.stringify({ input, lang, enrich: false }),
+      timeoutMs: DISCOVER_FETCH_TIMEOUT_MS,
     });
     return {
       tracks: mapDiscoverResults(data),
