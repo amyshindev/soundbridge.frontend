@@ -57,6 +57,7 @@ interface ApiCuePoint {
 interface ApiTrack {
   id: string;
   title: string;
+  title_en?: string | null;
   artist: string;
   instrument: string;
   jangdan: string;
@@ -92,6 +93,7 @@ function mapTrack(track: ApiTrack): GugakTrack {
   return {
     id: String(track.id),
     title: track.title,
+    titleEn: track.title_en ?? undefined,
     artist: track.artist,
     instrument: track.instrument,
     jangdan: track.jangdan,
@@ -348,6 +350,7 @@ const MOCK_TRACKS: GugakTrack[] = [
   {
     id: 'track_1',
     title: '비단길 위의 가야금 선율',
+    titleEn: 'Gayageum melody on the Silk Road',
     artist: '국립국악원',
     instrument: '가야금',
     jangdan: '굿거리',
@@ -371,6 +374,7 @@ const MOCK_TRACKS: GugakTrack[] = [
   {
     id: 'track_2',
     title: '태평성대 자진모리 대금 독주',
+    titleEn: 'Daegeum solo in Jajinmori during a peaceful reign',
     artist: '국립국악원',
     instrument: '대금',
     jangdan: '자진모리',
@@ -394,6 +398,7 @@ const MOCK_TRACKS: GugakTrack[] = [
   {
     id: 'track_3',
     title: '새벽 안개 걷히는 해금 가락',
+    titleEn: 'Haegeum tune as the morning mist clears',
     artist: '국립국악원',
     instrument: '해금',
     jangdan: '중모리',
@@ -417,6 +422,7 @@ const MOCK_TRACKS: GugakTrack[] = [
   {
     id: 'track_4',
     title: '바람의 엇모리 피리 루프',
+    titleEn: "Wind's Eotmori Piri loop",
     artist: '국립국악원',
     instrument: '피리',
     jangdan: '엇모리',
@@ -439,6 +445,7 @@ const MOCK_TRACKS: GugakTrack[] = [
   {
     id: 'track_5',
     title: '휘모리 휘감는 아쟁 앙상블',
+    titleEn: 'Ajaeng ensemble winding through Hwimori',
     artist: '국립국악원',
     instrument: '아쟁',
     jangdan: '휘모리',

@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Chip } from '../common/Chip';
 import { useLocale } from '@/context/LocaleContext';
 
-export const SuggestionChips = () => {
+export interface SuggestionChipsProps {
+  size?: 'default' | 'large';
+}
+
+export const SuggestionChips = ({ size = 'default' }: SuggestionChipsProps) => {
   const router = useRouter();
   const { t } = useLocale();
   const suggestions = ['Coldplay', '아이유', 'Billie Eilish', '재즈', '클래식'];
@@ -14,9 +18,13 @@ export const SuggestionChips = () => {
     router.push(`/discover?q=${encodeURIComponent(value)}`);
   };
 
+  const isLarge = size === 'large';
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-1.5 font-sans select-none">
-      <span className="text-[11px] text-sb-muted mr-1">{t('suggestion_label')}</span>
+    <div className={`flex flex-wrap items-center justify-center font-sans select-none ${isLarge ? 'gap-2' : 'gap-1.5'}`}>
+      <span className={`text-sb-muted mr-1 ${isLarge ? 'text-[13px] md:text-[14px]' : 'text-[11px]'}`}>
+        {t('suggestion_label')}
+      </span>
       {suggestions.map((item) => (
         <Chip
           key={item}
@@ -24,7 +32,9 @@ export const SuggestionChips = () => {
           variant="default"
           active={false}
           onClick={() => handleClick(item)}
-          className="py-[3px] px-2.5 text-[11px] border-sb-border text-sb-muted hover:border-sb-muted"
+          className={`border-sb-border text-sb-muted hover:border-sb-muted ${
+            isLarge ? 'py-1 px-3 text-[13px] md:text-[14px]' : 'py-[3px] px-2.5 text-[11px]'
+          }`}
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getPopularTracks } from '@/lib/api';
-import { HomeContent } from '@/components/home/HomeContent';
+import { HomeWithIntro } from '@/components/home/HomeWithIntro';
 
 export const revalidate = 3600;
 
@@ -13,5 +13,5 @@ export default async function Home() {
     console.error('Failed to load popular tracks in server component', error);
   }
 
-  return <HomeContent popularTracks={popularTracks} />;
+  return <HomeWithIntro popularTracks={popularTracks} />;
 }

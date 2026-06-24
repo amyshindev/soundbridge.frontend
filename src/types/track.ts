@@ -7,6 +7,7 @@ export interface CuePoint {
 export interface GugakTrack {
   id: string;
   title: string;
+  titleEn?: string;
   artist: string;
   instrument: string;
   // [v4.0] jangdan: 백엔드 gugak_tracks.jangdan_name FK 값 (예: "자진모리")

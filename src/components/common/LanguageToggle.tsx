@@ -13,7 +13,7 @@ export const LanguageToggle = () => {
       type="button"
       onClick={() => setLocale(code)}
       className={clsx(
-        'px-0.5 py-0 text-[11px] font-medium transition-colors',
+        'px-1 py-0.5 text-[12px] font-medium transition-colors rounded',
         locale === code ? 'text-sb-primary' : 'text-sb-muted hover:text-sb-primary'
       )}
       aria-pressed={locale === code}
@@ -25,12 +25,12 @@ export const LanguageToggle = () => {
 
   return (
     <div
-      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-sb-surface transition-colors select-none"
+      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-sb-surface/80 border border-sb-border/60 hover:border-sb-border transition-colors select-none"
       role="group"
       aria-label="Language"
     >
       {renderOption('ko', 'KO')}
-      <span className="text-[11px] text-sb-border" aria-hidden>
+      <span className="text-[11px] text-sb-border/80" aria-hidden>
         |
       </span>
       {renderOption('en', 'EN')}

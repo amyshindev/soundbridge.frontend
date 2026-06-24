@@ -1,11 +1,15 @@
+'use client';
+
 import React from 'react';
 import { clsx } from 'clsx';
+import { useLocale } from '@/context/LocaleContext';
 
 export interface LicenseBadgeProps {
   licenseType: 'KOGL_1' | 'KOGL_2';
 }
 
 export const LicenseBadge = ({ licenseType }: LicenseBadgeProps) => {
+  const { t } = useLocale();
   const isKogl1 = licenseType === 'KOGL_1';
 
   return (
@@ -15,7 +19,7 @@ export const LicenseBadge = ({ licenseType }: LicenseBadgeProps) => {
         isKogl1 ? 'bg-[#EAF2EE] text-sb-green' : 'bg-[#E6EFF8] text-sb-blue'
       )}
     >
-      {isKogl1 ? '상업 가능' : '출처 표시'}
+      {isKogl1 ? t('create_license_commercial') : t('create_license_attribution')}
     </span>
   );
 };

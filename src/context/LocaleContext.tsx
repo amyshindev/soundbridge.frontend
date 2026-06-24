@@ -13,15 +13,15 @@ interface LocaleContextValue {
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('ko');
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === 'undefined') return 'ko';
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+    return isLocale(stored) ? stored : 'ko';
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (isLocale(stored)) {
-      setLocaleState(stored);
-      document.documentElement.lang = stored;
-    }
-  }, []);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);

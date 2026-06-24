@@ -11,6 +11,7 @@ import { EmotionTagChips } from './EmotionTagChips';
 import { CreateBridgeButton } from './CreateBridgeButton';
 import { GhostButton } from '../common/GhostButton';
 import { useLocale } from '@/context/LocaleContext';
+import { labelInstrument, labelTrackTitle } from '@/lib/i18n/labels';
 import { Music, Play, Pause, Heart, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -28,7 +29,7 @@ export const ResultCard = ({
   className = '',
 }: ResultCardProps) => {
   const router = useRouter();
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const { currentTrack, isPlaying, play, pause } = usePlayer();
 
   const isCurrentTrack = currentTrack?.id === track.id;
@@ -98,10 +99,10 @@ export const ResultCard = ({
         {/* Instrument Label & Title */}
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] text-sb-muted font-medium uppercase tracking-wider">
-            {track.instrument}
+            {labelInstrument(locale, track.instrument)}
           </span>
           <h4 className="text-[14px] font-medium text-sb-primary leading-tight truncate">
-            {track.title}
+            {labelTrackTitle(locale, track.title, track.titleEn)}
           </h4>
         </div>
 

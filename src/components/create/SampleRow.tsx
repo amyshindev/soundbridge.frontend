@@ -5,6 +5,7 @@ import { Sample } from '@/types/sample';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useToast } from '@/hooks/useToast';
 import { useLocale } from '@/context/LocaleContext';
+import { labelTrackTitle } from '@/lib/i18n/labels';
 import { MiniWaveform } from './MiniWaveform';
 import { LoopBadge } from './LoopBadge';
 import { LicenseBadge } from './LicenseBadge';
@@ -17,7 +18,7 @@ export interface SampleRowProps {
 export const SampleRow = ({ sample }: SampleRowProps) => {
   const { currentTrack, isPlaying, play, pause } = usePlayer();
   const { showToast } = useToast();
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
 
   const isCurrent = currentTrack?.id === sample.id;
   const isCurrentlyPlaying = isCurrent && isPlaying;
@@ -36,7 +37,7 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
     // Simulate WAV download
     const link = document.createElement('a');
     link.href = sample.audioUrl;
-    link.download = `${sample.title}.wav`;
+    link.download = `${labelTrackTitle(locale, sample.title, sample.titleEn)}.wav`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -61,11 +62,18 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
 
         {/* Info */}
         <div className="flex flex-col min-w-0">
-          <span className="text-[13px] font-medium text-sb-primary truncate" title={sample.title}>
-            {sample.title}
+          <span
+            className="text-[13px] font-medium text-sb-primary truncate"
+            title={labelTrackTitle(locale, sample.title, sample.titleEn)}
+          >
+            {labelTrackTitle(locale, sample.title, sample.titleEn)}
           </span>
           <span className="text-[10px] text-sb-muted font-normal">
-            {sample.measures}마디 · {sample.bpm} BPM · {sample.key}
+            {t('create_measures_meta', {
+              measures: sample.measures,
+              bpm: sample.bpm,
+              key: sample.key,
+            })}
           </span>
         </div>
       </div>
@@ -87,7 +95,7 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
         <button
           onClick={handleDownload}
           className="w-8 h-8 rounded-lg border border-sb-border hover:bg-sb-surface text-sb-primary flex items-center justify-center transition-colors shrink-0"
-          title="다운로드 (WAV)"
+          title={t('sample_download_title')}
         >
           <Download className="w-3.5 h-3.5" />
         </button>
