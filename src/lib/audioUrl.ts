@@ -8,7 +8,7 @@ function getApiBaseUrl(): string {
     return '';
   }
 
-  return (process.env.API_URL || 'http://localhost:8000').replace(/\/$/, '');
+  return (process.env.API_URL || 'https://soundbridgebackend-production.up.railway.app').replace(/\/$/, '');
 }
 
 /** DB의 파일명(KC_TM_..._S000063.wav) 또는 전체 URL을 재생 가능한 주소로 변환 */
