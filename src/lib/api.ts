@@ -29,7 +29,7 @@ function getBaseUrl(): string {
     return `https://${process.env.VERCEL_URL}`;
   }
 
-  return (process.env.API_URL || 'http://localhost:8000').replace(/\/$/, '');
+  return (process.env.API_URL || 'https://soundbridgebackend-production.up.railway.app').replace(/\/$/, '');
 }
 
 /** dev 또는 NEXT_PUBLIC_USE_MOCK=true 일 때만 mock fallback */
