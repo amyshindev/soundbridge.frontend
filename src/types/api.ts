@@ -17,17 +17,19 @@ export type DataSource = 'api' | 'mock';
 //   LOOP_UNIT_OPTIONS 상수의 value 타입과 일치해야 함
 export interface CreateFilter {
   instruments: string[];
+  genres: string[];
   jangdans: string[];
   emotions: string[];
   bpmMin: number;
   bpmMax: number;
-  loopUnit: number | null; // number | null
+  loopUnit: number | null;
   license: 'commercial' | 'attribution' | 'all';
 }
 
 /** CREATE API 쿼리 파라미터 (서버 필터링) */
 export interface SampleFilters {
   instruments?: string[];
+  genres?: string[];
   jangdans?: string[];
   emotions?: string[];
   bpmMin?: number;
@@ -53,4 +55,14 @@ export interface DiscoverResult {
 export interface PopularTracksResult {
   tracks: import('./track').GugakTrack[];
   source: DataSource;
+}
+
+/** iTunes 기반 정식 발매 곡 자동완성 */
+export interface TrackSuggestion {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  artworkUrl: string;
+  display: string;
 }

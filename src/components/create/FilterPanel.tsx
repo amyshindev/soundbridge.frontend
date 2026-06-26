@@ -6,8 +6,14 @@ import { CreatePreset } from '@/types/preset';
 import { PresetBanner } from './PresetBanner';
 import { LoopUnitFilter } from './LoopUnitFilter';
 import { Chip } from '../common/Chip';
-import { INSTRUMENTS, JANGDANS, EMOTIONS, JANGDAN_LOOP_MAP } from '@/lib/constants';
-import { labelEmotion, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
+import {
+  CREATE_GENRES,
+  CREATE_INSTRUMENTS,
+  CREATE_JANGDANS,
+  EMOTIONS,
+  JANGDAN_LOOP_MAP,
+} from '@/lib/constants';
+import { labelEmotion, labelGenre, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
 import { useLocale } from '@/context/LocaleContext';
 import { RotateCcw } from 'lucide-react';
 
@@ -71,6 +77,14 @@ export const FilterPanel = ({
     });
   };
 
+  const handleGenreToggle = (genre: string) => {
+    const isSelected = filters.genres.includes(genre);
+    const newGenres = isSelected
+      ? filters.genres.filter((g) => g !== genre)
+      : [...filters.genres, genre];
+    onChange({ ...filters, genres: newGenres });
+  };
+
   const handleEmotionToggle = (emotion: string) => {
     const isSelected = filters.emotions.includes(emotion);
     const newEmotions = isSelected
@@ -100,10 +114,11 @@ export const FilterPanel = ({
   const handleReset = () => {
     onChange({
       instruments: [],
+      genres: [],
       jangdans: [],
       emotions: [],
-      bpmMin: 60,
-      bpmMax: 200,
+      bpmMin: 0,
+      bpmMax: 300,
       loopUnit: null,
       license: 'all',
     });
@@ -120,13 +135,13 @@ export const FilterPanel = ({
 
       {/* Filter Sections Scroll Container */}
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-6 scrollbar-thin">
-        {/* Section: Instrument */}
+        {/* Section: 음원 유형 (가창/판소리) */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
-            {t('create_filter_instrument')}
+            {t('create_filter_type')}
           </span>
-          <div className="grid grid-cols-4 sm:grid-cols-4 gap-1.5">
-            {INSTRUMENTS.map((inst) => (
+          <div className="grid grid-cols-2 gap-1.5">
+            {CREATE_INSTRUMENTS.map((inst) => (
               <Chip
                 key={inst}
                 label={labelInstrument(locale, inst)}
@@ -138,13 +153,31 @@ export const FilterPanel = ({
           </div>
         </div>
 
+        {/* Section: 장르 */}
+        <div className="flex flex-col gap-2.5">
+          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+            {t('create_filter_genre')}
+          </span>
+          <div className="grid grid-cols-2 gap-1.5">
+            {CREATE_GENRES.map((genre) => (
+              <Chip
+                key={genre}
+                label={labelGenre(locale, genre)}
+                active={filters.genres.includes(genre)}
+                onClick={() => handleGenreToggle(genre)}
+                className="py-1 text-[11px]"
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Section: Jangdan */}
         <div className="flex flex-col gap-2.5">
           <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
             {t('create_filter_jangdan')}
           </span>
-          <div className="grid grid-cols-3 gap-1.5">
-            {JANGDANS.map((jd) => (
+          <div className="grid grid-cols-2 gap-1.5">
+            {CREATE_JANGDANS.map((jd) => (
               <Chip
                 key={jd}
                 label={labelJangdan(locale, jd)}
@@ -191,8 +224,8 @@ export const FilterPanel = ({
                 <span className="text-[9px] text-sb-muted font-mono">MIN</span>
                 <input
                   type="range"
-                  min="60"
-                  max="200"
+                  min="0"
+                  max="300"
                   value={filters.bpmMin}
                   onChange={handleBpmMinChange}
                   className="w-full accent-sb-accent h-1 bg-sb-border rounded-lg appearance-none cursor-pointer"
@@ -202,8 +235,8 @@ export const FilterPanel = ({
                 <span className="text-[9px] text-sb-muted font-mono">MAX</span>
                 <input
                   type="range"
-                  min="60"
-                  max="200"
+                  min="0"
+                  max="300"
                   value={filters.bpmMax}
                   onChange={handleBpmMaxChange}
                   className="w-full accent-sb-accent h-1 bg-sb-border rounded-lg appearance-none cursor-pointer"

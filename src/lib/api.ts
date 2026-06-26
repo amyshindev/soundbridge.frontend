@@ -1,5 +1,6 @@
 import { GugakTrack, MatchResult } from '@/types/track';
 import { Sample } from '@/types/sample';
+import { resolveAudioUrl } from '@/lib/audioUrl';
 import {
   CreateFilter,
   DataSource,
@@ -7,11 +8,12 @@ import {
   PopularTracksResult,
   SampleFilters,
   SampleListResult,
+  TrackSuggestion,
 } from '@/types/api';
 
 const API_PREFIX = '/api/soundbridge';
-/** DISCOVER: 임베딩+DB는 보통 수 초, Gemini enrich 미사용 기준 */
-const DISCOVER_FETCH_TIMEOUT_MS = 30_000;
+/** DISCOVER: Ollama 임베딩 + EXAONE 매칭 설명 (로컬 LLM 여유) */
+const DISCOVER_FETCH_TIMEOUT_MS = 120_000;
 const DEFAULT_FETCH_TIMEOUT_MS = 15_000;
 
 /** 브라우저: same-origin 프록시. SSR: Vercel URL 또는 API_URL. 로컬: NEXT_PUBLIC_API_URL 우선 */
@@ -105,7 +107,7 @@ function mapTrack(track: ApiTrack): GugakTrack {
       label: cp.label as 'A' | 'B' | 'C',
       emotion: cp.emotion,
     })),
-    audioUrl: track.audio_url,
+    audioUrl: resolveAudioUrl(track.audio_url),
     licenseType: track.license_type,
     licenseLabelEn: track.license_label_en,
     publicLicenseType: inferPublicLicenseType(track.license_type),
@@ -134,6 +136,9 @@ function mapDiscoverResults(data: ApiDiscoverResponse): MatchResult[] {
   }));
 }
 
+export const CREATE_BPM_MIN = 0;
+export const CREATE_BPM_MAX = 300;
+
 export function createFilterToSampleFilters(filters: CreateFilter): SampleFilters {
   const sampleFilters: SampleFilters = {
     limit: 100,
@@ -143,16 +148,19 @@ export function createFilterToSampleFilters(filters: CreateFilter): SampleFilter
   if (filters.instruments.length > 0) {
     sampleFilters.instruments = filters.instruments;
   }
+  if (filters.genres.length > 0) {
+    sampleFilters.genres = filters.genres;
+  }
   if (filters.jangdans.length > 0) {
     sampleFilters.jangdans = filters.jangdans;
   }
   if (filters.emotions.length > 0) {
     sampleFilters.emotions = filters.emotions;
   }
-  if (filters.bpmMin !== 60) {
+  if (filters.bpmMin !== CREATE_BPM_MIN) {
     sampleFilters.bpmMin = filters.bpmMin;
   }
-  if (filters.bpmMax !== 200) {
+  if (filters.bpmMax !== CREATE_BPM_MAX) {
     sampleFilters.bpmMax = filters.bpmMax;
   }
   if (filters.loopUnit !== null) {
@@ -169,6 +177,7 @@ export function buildSampleQueryString(filters: SampleFilters): string {
   const params = new URLSearchParams();
 
   filters.instruments?.forEach((value) => params.append('instruments', value));
+  filters.genres?.forEach((value) => params.append('genres', value));
   filters.jangdans?.forEach((value) => params.append('jangdans', value));
   filters.emotions?.forEach((value) => params.append('emotions', value));
 
@@ -245,6 +254,38 @@ async function withMockFallback<T>(
   }
 }
 
+interface ApiSuggestResponse {
+  suggestions: Array<{
+    id: string;
+    title: string;
+    artist: string;
+    album: string;
+    artwork_url: string;
+    display: string;
+  }>;
+}
+
+function mapSuggestion(item: ApiSuggestResponse['suggestions'][number]): TrackSuggestion {
+  return {
+    id: item.id,
+    title: item.title,
+    artist: item.artist,
+    album: item.album,
+    artworkUrl: item.artwork_url,
+    display: item.display,
+  };
+}
+
+export async function suggestReleasedTracks(query: string, limit = 8): Promise<TrackSuggestion[]> {
+  const q = query.trim();
+  if (q.length < 2) {
+    return [];
+  }
+  const params = new URLSearchParams({ q, limit: String(limit) });
+  const data = await apiFetch<ApiSuggestResponse>(`/discover/suggest?${params.toString()}`);
+  return data.suggestions.map(mapSuggestion);
+}
+
 export async function getPopularTracks(limit = 6): Promise<PopularTracksResult> {
   const { data, source } = await withMockFallback(
     `/discover/popular?limit=${limit}`,
@@ -261,7 +302,7 @@ export async function discoverTracks(input: string, lang = 'ko'): Promise<Discov
   try {
     const data = await apiFetch<ApiDiscoverResponse>('/discover', {
       method: 'POST',
-      body: JSON.stringify({ input, lang, enrich: false }),
+      body: JSON.stringify({ input, lang, enrich: true }),
       timeoutMs: DISCOVER_FETCH_TIMEOUT_MS,
     });
     return {
@@ -307,10 +348,11 @@ export async function listSamples(filters: SampleFilters = {}): Promise<SampleLi
 function filterMockSamples(filters: SampleFilters): Sample[] {
   const createFilter: CreateFilter = {
     instruments: filters.instruments ?? [],
+    genres: filters.genres ?? [],
     jangdans: filters.jangdans ?? [],
     emotions: filters.emotions ?? [],
-    bpmMin: filters.bpmMin ?? 60,
-    bpmMax: filters.bpmMax ?? 200,
+    bpmMin: filters.bpmMin ?? CREATE_BPM_MIN,
+    bpmMax: filters.bpmMax ?? CREATE_BPM_MAX,
     loopUnit: filters.loopUnit ?? null,
     license: filters.license ?? 'all',
   };
@@ -326,7 +368,7 @@ function filterMockSamples(filters: SampleFilters): Sample[] {
       const hasOverlap = sample.emotionTags.some((tag) => createFilter.emotions.includes(tag));
       if (!hasOverlap) return false;
     }
-    if (sample.bpm < createFilter.bpmMin || sample.bpm > createFilter.bpmMax) {
+    if (sample.bpm !== 0 && (sample.bpm < createFilter.bpmMin || sample.bpm > createFilter.bpmMax)) {
       return false;
     }
     if (createFilter.loopUnit !== null && sample.loopUnitBeats !== createFilter.loopUnit) {

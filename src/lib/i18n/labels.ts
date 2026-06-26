@@ -9,6 +9,17 @@ const INSTRUMENT_EN: Record<string, string> = {
   피리: 'Piri',
   아쟁: 'Ajaeng',
   소금: 'Sogeom',
+  가창: 'Vocal',
+  판소리: 'Pansori',
+  미분류: 'Unspecified',
+};
+
+const GENRE_EN: Record<string, string> = {
+  궁중음악: 'Court music',
+  풍류음악: 'Pungnyu',
+  판소리: 'Pansori',
+  민요: 'Folk song',
+  불교음악: 'Buddhist music',
 };
 
 const EMOTION_EN: Record<string, string> = {
@@ -43,6 +54,11 @@ const TRACK_TITLE_EN: Record<string, string> = {
 
 export function labelInstrument(locale: Locale, value: string): string {
   if (locale === 'en') return INSTRUMENT_EN[value] ?? value;
+  return value;
+}
+
+export function labelGenre(locale: Locale, value: string): string {
+  if (locale === 'en') return GENRE_EN[value] ?? value;
   return value;
 }
 

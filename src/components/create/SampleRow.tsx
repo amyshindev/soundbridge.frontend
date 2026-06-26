@@ -6,6 +6,7 @@ import { usePlayer } from '@/hooks/usePlayer';
 import { useToast } from '@/hooks/useToast';
 import { useLocale } from '@/context/LocaleContext';
 import { labelTrackTitle } from '@/lib/i18n/labels';
+import { audioFilenameExtension, resolveAudioUrl } from '@/lib/audioUrl';
 import { MiniWaveform } from './MiniWaveform';
 import { LoopBadge } from './LoopBadge';
 import { LicenseBadge } from './LicenseBadge';
@@ -34,10 +35,11 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Simulate WAV download
+    const url = resolveAudioUrl(sample.audioUrl);
+    const ext = audioFilenameExtension(sample.audioUrl);
     const link = document.createElement('a');
-    link.href = sample.audioUrl;
-    link.download = `${labelTrackTitle(locale, sample.title, sample.titleEn)}.wav`;
+    link.href = url;
+    link.download = `${labelTrackTitle(locale, sample.title, sample.titleEn)}${ext}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

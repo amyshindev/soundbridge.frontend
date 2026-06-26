@@ -6,23 +6,35 @@ import { FilterPanel } from '@/components/create/FilterPanel';
 import { SamplePanel } from '@/components/create/SamplePanel';
 import { CreateFilter } from '@/types/api';
 import { Sample } from '@/types/sample';
-import { createFilterToSampleFilters, listSamples } from '@/lib/api';
+import { CREATE_BPM_MAX, CREATE_BPM_MIN, createFilterToSampleFilters, listSamples } from '@/lib/api';
 import { useLocale } from '@/context/LocaleContext';
-import { labelEmotion, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
+import { labelEmotion, labelGenre, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
+import { CREATE_INSTRUMENTS } from '@/lib/constants';
+
+const DEFAULT_FILTERS: CreateFilter = {
+  instruments: [],
+  genres: [],
+  jangdans: [],
+  emotions: [],
+  bpmMin: CREATE_BPM_MIN,
+  bpmMax: CREATE_BPM_MAX,
+  loopUnit: null,
+  license: 'all',
+};
+
+function mapPresetInstrument(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  if ((CREATE_INSTRUMENTS as readonly string[]).includes(raw)) return raw;
+  if (raw === '판소리') return '판소리';
+  // DISCOVER mock 악기명(가야금 등) → TM 가창
+  return '가창';
+}
 
 const CreateContent = () => {
   const { preset, hasPreset } = useCreatePreset();
   const { locale, t } = useLocale();
 
-  const [filters, setFilters] = useState<CreateFilter>({
-    instruments: [],
-    jangdans: [],
-    emotions: [],
-    bpmMin: 60,
-    bpmMax: 200,
-    loopUnit: null,
-    license: 'all',
-  });
+  const [filters, setFilters] = useState<CreateFilter>(DEFAULT_FILTERS);
 
   const [showPresetBanner, setShowPresetBanner] = useState(false);
   const [samples, setSamples] = useState<Sample[]>([]);
@@ -31,12 +43,14 @@ const CreateContent = () => {
 
   useEffect(() => {
     if (hasPreset) {
+      const instrument = mapPresetInstrument(preset.instrument);
       setFilters({
-        instruments: preset.instrument ? [preset.instrument] : [],
+        instruments: instrument ? [instrument] : [],
+        genres: [],
         jangdans: [],
         emotions: preset.emotion ? [preset.emotion] : [],
-        bpmMin: preset.bpmMin || 60,
-        bpmMax: preset.bpmMax || 200,
+        bpmMin: preset.bpmMin ?? CREATE_BPM_MIN,
+        bpmMax: preset.bpmMax ?? CREATE_BPM_MAX,
         loopUnit: null,
         license: 'all',
       });
@@ -68,13 +82,18 @@ const CreateContent = () => {
     if (filters.instruments.length > 0) {
       summary.push(filters.instruments.map((i) => labelInstrument(locale, i)).join(', '));
     }
+    if (filters.genres.length > 0) {
+      summary.push(filters.genres.map((g) => labelGenre(locale, g)).join(', '));
+    }
     if (filters.jangdans.length > 0) {
       summary.push(filters.jangdans.map((j) => labelJangdan(locale, j)).join(', '));
     }
     if (filters.emotions.length > 0) {
       summary.push(filters.emotions.map((e) => labelEmotion(locale, e)).join(', '));
     }
-    summary.push(`${filters.bpmMin}–${filters.bpmMax} BPM`);
+    if (filters.bpmMin !== CREATE_BPM_MIN || filters.bpmMax !== CREATE_BPM_MAX) {
+      summary.push(`${filters.bpmMin}–${filters.bpmMax} BPM`);
+    }
     if (filters.loopUnit !== null) {
       summary.push(`${filters.loopUnit}${t('create_beats_suffix')}`);
     } else {
@@ -91,15 +110,7 @@ const CreateContent = () => {
   }, [filters, locale, t]);
 
   const handleResetFilters = () => {
-    setFilters({
-      instruments: [],
-      jangdans: [],
-      emotions: [],
-      bpmMin: 60,
-      bpmMax: 200,
-      loopUnit: null,
-      license: 'all',
-    });
+    setFilters(DEFAULT_FILTERS);
     setShowPresetBanner(false);
   };
 

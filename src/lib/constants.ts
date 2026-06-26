@@ -50,7 +50,13 @@ export const LOOP_UNIT_OPTIONS = [
   { label: '전체', value: null },
 ] as const;
 
-// 필터 옵션 상수 (FilterPanel UI 렌더링에 사용)
+// TM 학습데이터 기준 CREATE 필터 (instrument=가창/판소리, genre_mclsf=중분류)
+export const CREATE_INSTRUMENTS = ['가창', '판소리'] as const;
+export const CREATE_GENRES = ['궁중음악', '풍류음악', '판소리', '민요', '불교음악'] as const;
+/** DB에 실제 존재하는 장단 (573곡 중 자진모리·중모리만) */
+export const CREATE_JANGDANS = ['자진모리', '중모리'] as const;
+
+// DISCOVER mock / 레거시 호환
 export const INSTRUMENTS = ['장구', '가야금', '대금', '해금', '거문고', '피리', '아쟁', '소금'] as const;
 export const JANGDANS = ['자진모리', '중모리', '굿거리', '휘모리', '세마치', '엇모리'] as const;
 export const EMOTIONS = ['신남', '서정', '웅장', '슬픔', '신비', '차분'] as const;
