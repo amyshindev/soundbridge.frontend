@@ -25,6 +25,8 @@ export interface SearchBarProps {
   isSearching?: boolean;
   showModeToggle?: boolean;
   onModeChange?: (mode: DiscoverSearchMode) => void;
+  /** /discover 에서 동일 검색어로 다시 찾기 */
+  onRepeatSearch?: () => void;
 }
 
 const DEBOUNCE_MS = 300;
@@ -37,6 +39,7 @@ export const SearchBar = ({
   isSearching = false,
   showModeToggle = true,
   onModeChange,
+  onRepeatSearch,
 }: SearchBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -81,9 +84,17 @@ export const SearchBar = ({
       if (!trimmed) return;
       if (searchMode === 'mood' && trimmed.length < MOOD_SEARCH_MIN_LENGTH) return;
       setIsOpen(false);
+
+      const currentQ = (searchParams.get('q') ?? '').trim();
+      const currentMode = parseDiscoverMode(searchParams.get('mode'));
+      if (isDiscoverPage && trimmed === currentQ && searchMode === currentMode) {
+        onRepeatSearch?.();
+        return;
+      }
+
       router.push(buildDiscoverHref(trimmed, searchMode));
     },
-    [router, mode],
+    [router, mode, isDiscoverPage, searchParams, onRepeatSearch],
   );
 
   const handleModeChange = useCallback(
@@ -131,12 +142,14 @@ export const SearchBar = ({
       return;
     }
 
+    setSuggestions([]);
+    setActiveIndex(-1);
     setIsLoading(true);
     debounceRef.current = setTimeout(async () => {
       try {
         const items = await suggestReleasedTracks(trimmed);
         setSuggestions(items);
-        setActiveIndex(items.length > 0 ? 0 : -1);
+        setActiveIndex(-1);
       } catch {
         setSuggestions([]);
         setActiveIndex(-1);
@@ -169,24 +182,23 @@ export const SearchBar = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
-    if (mode === 'song' && activeIndex >= 0 && suggestions[activeIndex]) {
-      handleSelect(suggestions[activeIndex]);
-      return;
-    }
     navigateToDiscover(query, mode);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (mode !== 'song' || !isOpen || suggestions.length === 0) {
+    if (mode !== 'song' || !isOpen) {
       return;
     }
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown' && suggestions.length > 0) {
       e.preventDefault();
       setActiveIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === 'ArrowUp' && suggestions.length > 0) {
       e.preventDefault();
       setActiveIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+    } else if (e.key === 'Enter' && activeIndex >= 0 && suggestions[activeIndex]) {
+      e.preventDefault();
+      handleSelect(suggestions[activeIndex]);
     } else if (e.key === 'Escape') {
       setIsOpen(false);
       setActiveIndex(-1);
@@ -222,6 +234,7 @@ export const SearchBar = ({
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setActiveIndex(-1);
               if (mode === 'song') {
                 setIsOpen(true);
               }
@@ -259,6 +272,12 @@ export const SearchBar = ({
           </button>
         </div>
       </form>
+
+      {mode === 'mood' && query.trim().length > 0 && query.trim().length < MOOD_SEARCH_MIN_LENGTH && (
+        <p className="text-xs text-slate-400 text-center w-full">
+          {t('search_mood_min_length')}
+        </p>
+      )}
 
       {mode === 'song' && isOpen && (
         <SearchSuggestions

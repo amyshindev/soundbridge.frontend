@@ -28,6 +28,7 @@ const DiscoverContent = () => {
   const [inputSummary, setInputSummary] = useState('');
   const [popularTracks, setPopularTracks] = useState<GugakTrack[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchNonce, setSearchNonce] = useState(0);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -74,14 +75,18 @@ const DiscoverContent = () => {
     };
 
     fetchResults();
-  }, [query, locale, mode, t]);
+  }, [query, locale, mode, t, searchNonce]);
 
   const handleResetSearch = () => {
     router.push(buildDiscoverHref('', mode));
   };
 
   const handleRetry = () => {
-    router.refresh();
+    if (query) {
+      setSearchNonce((n) => n + 1);
+    } else {
+      router.refresh();
+    }
   };
 
   const heroSubtitle =
@@ -133,6 +138,7 @@ const DiscoverContent = () => {
             initialMode={mode}
             size="large"
             isSearching={isLoading && !!query}
+            onRepeatSearch={() => setSearchNonce((n) => n + 1)}
           />
         </div>
 
