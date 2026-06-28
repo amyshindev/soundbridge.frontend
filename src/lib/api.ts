@@ -12,7 +12,7 @@ import {
 } from '@/types/api';
 
 const API_PREFIX = '/api/soundbridge';
-/** DISCOVER: Ollama 임베딩 + EXAONE 매칭 설명 (로컬 LLM 여유) */
+/** DISCOVER: 임베딩 + EXAONE 매칭 설명 */
 const DISCOVER_FETCH_TIMEOUT_MS = 120_000;
 const DEFAULT_FETCH_TIMEOUT_MS = 15_000;
 

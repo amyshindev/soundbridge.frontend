@@ -61,7 +61,7 @@ export default function PrivacyPage() {
           <h2 className="text-[18px] font-medium text-sb-primary mt-4 mb-2">5. 외부 서비스 연동 고지</h2>
           <p>더 안정적인 서비스 제공을 위해 아래와 같은 글로벌 검증 인프라 및 클라우드를 활용하고 있습니다.</p>
           <ul className="list-disc pl-5 mt-2 flex flex-col gap-1">
-            <li><strong>Ollama (Fly.io) / Google OAuth:</strong> AI 감성 번역 및 소셜 계정 가입 처리</li>
+            <li><strong>Friendli AI (EXAONE) / Google OAuth:</strong> AI 감성 번역 및 소셜 계정 가입 처리</li>
             <li><strong>Neon DB / Supabase:</strong> 클라우드 기반 데이터베이스 및 암호화 이력 보존</li>
             <li><strong>Vercel Inc:</strong> 글로벌 정적 페이지 및 클라우드 컴퓨팅 서버 웹 호스팅</li>
             <li><strong>Resend / SendGrid:</strong> 회원 인증용 이메일 자동 발송 서비스</li>

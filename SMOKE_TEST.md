@@ -7,7 +7,7 @@
 | 1 | `GET /health` | 200 `{ status: "ok" }` |
 | 2 | `GET /api/soundbridge/discover/popular?limit=6` | 200, `jangdan`, `emotion_tags` |
 | 3 | `GET /api/soundbridge/create/samples` | 200 `{ tracks, total }` |
-| 4 | `POST /api/soundbridge/discover` body `{ input, lang }` | 200 `{ tracks, input_summary }` or 503 (Ollama) |
+| 4 | `POST /api/soundbridge/discover` body `{ input, lang }` | 200 `{ tracks, input_summary }` or 503 (EXAONE) |
 
 Env: `NEXT_PUBLIC_API_URL=http://localhost:8000`, root `.env` `FRONTEND_URL=http://localhost:3000`
 

@@ -17,7 +17,7 @@ export default function TermsPage() {
         <div>
           <h2 className="text-[18px] font-medium text-sb-primary mt-4 mb-2">1. 서비스 소개 및 목적</h2>
           <p>
-            본 약관은 <strong>SoundBridge (사운드브릿지)</strong>가 제공하는 웹 서비스 및 관련 기능의 이용 조건과 절차를 규정합니다. SoundBridge는 국립국악원 공공누리 제1유형 및 제2유형 라이선스 음원을 기반으로 사용자가 좋아하는 대중음악 언어를 AI 감성 분석 기술(Ollama 등)을 통해 국악과 매칭하고 창작용 오디오 샘플을 라이브러리 형태로 제공하는 혁신적 서비스입니다.
+            본 약관은 <strong>SoundBridge (사운드브릿지)</strong>가 제공하는 웹 서비스 및 관련 기능의 이용 조건과 절차를 규정합니다. SoundBridge는 국립국악원 공공누리 제1유형 및 제2유형 라이선스 음원을 기반으로 사용자가 좋아하는 대중음악 언어를 AI 감성 분석 기술(EXAONE 등)을 통해 국악과 매칭하고 창작용 오디오 샘플을 라이브러리 형태로 제공하는 혁신적 서비스입니다.
           </p>
         </div>
 
