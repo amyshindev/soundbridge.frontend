@@ -208,60 +208,66 @@ export const SearchBar = ({
         <SearchModeToggle mode={mode} onChange={handleModeChange} />
       )}
 
-      <form onSubmit={handleSubmit} className="relative w-full">
-        <div
-          className={`relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-shadow focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${
-            isLarge ? 'p-2' : 'p-1.5'
-          }`}
-        >
-          <Search
-            className={`absolute text-slate-400 shrink-0 ${isLarge ? 'left-6' : 'left-4'}`}
-            size={isLarge ? 20 : 18}
-          />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setActiveIndex(-1);
-              if (mode === 'song') {
-                setIsOpen(true);
-              }
-            }}
-            onFocus={() => {
-              if (mode === 'song') {
-                setIsOpen(true);
-              }
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder={inputPlaceholder}
-            autoComplete="off"
-            maxLength={200}
-            role={mode === 'song' ? 'combobox' : undefined}
-            aria-expanded={mode === 'song' && isOpen && query.trim().length >= 1}
-            aria-autocomplete={mode === 'song' ? 'list' : undefined}
-            className={`w-full bg-transparent border-none focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium min-w-0 ${
-              isLarge
-                ? 'pl-12 pr-4 py-4 text-base sm:text-lg'
-                : 'pl-10 pr-3 py-3 text-sm sm:text-base'
-            }`}
-          />
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            aria-busy={isSearching}
-            className={`bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:hover:bg-sky-500 text-white rounded-xl font-semibold transition-colors shrink-0 flex items-center gap-2 ${
-              isLarge ? 'px-6 sm:px-8 py-3.5' : 'px-5 py-2.5 text-sm'
+      <div className="relative w-full flex flex-col gap-1">
+        <form onSubmit={handleSubmit} className="relative w-full">
+          <div
+            className={`relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-shadow focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${
+              isLarge ? 'p-2' : 'p-1.5'
             }`}
           >
-            {isSearching ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              t('search_submit')
-            )}
-          </button>
-        </div>
-      </form>
+            <Search
+              className={`absolute text-slate-400 shrink-0 ${isLarge ? 'left-6' : 'left-4'}`}
+              size={isLarge ? 20 : 18}
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setActiveIndex(-1);
+                if (mode === 'song') {
+                  setIsOpen(true);
+                }
+              }}
+              onFocus={() => {
+                if (mode === 'song') {
+                  setIsOpen(true);
+                }
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={inputPlaceholder}
+              autoComplete="off"
+              maxLength={200}
+              role={mode === 'song' ? 'combobox' : undefined}
+              aria-expanded={mode === 'song' && isOpen && query.trim().length >= 1}
+              aria-autocomplete={mode === 'song' ? 'list' : undefined}
+              className={`w-full bg-transparent border-none focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium min-w-0 ${
+                isLarge
+                  ? 'pl-12 pr-4 py-4 text-base sm:text-lg'
+                  : 'pl-10 pr-3 py-3 text-sm sm:text-base'
+              }`}
+            />
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              aria-busy={isSearching}
+              className={`bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:hover:bg-sky-500 text-white rounded-xl font-semibold transition-colors shrink-0 flex items-center gap-2 ${
+                isLarge ? 'px-6 sm:px-8 py-3.5' : 'px-5 py-2.5 text-sm'
+              }`}
+            >
+              {isSearching ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                t('search_submit')
+              )}
+            </button>
+          </div>
+        </form>
+
+        <p className="text-[11px] text-slate-400 text-center tracking-wide select-none">
+          {t('search_powered_by')}
+        </p>
+      </div>
 
       {mode === 'mood' && query.trim().length > 0 && query.trim().length < MOOD_SEARCH_MIN_LENGTH && (
         <p className="text-xs text-slate-400 text-center w-full">
