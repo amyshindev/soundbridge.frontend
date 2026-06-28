@@ -27,7 +27,7 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] bg-sb-bg transition-opacity duration-[450ms] ease-out ${
+      className={`fixed inset-0 z-[200] bg-sky-50 transition-opacity duration-[450ms] ease-out ${
         fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       aria-hidden={fading}

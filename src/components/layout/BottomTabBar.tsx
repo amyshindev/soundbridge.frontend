@@ -13,7 +13,6 @@ export const BottomTabBar = () => {
   const { t } = useLocale();
   const { currentTrack } = usePlayer();
 
-  // If PlayerBar is active, hide the tabbar on mobile
   if (currentTrack) return null;
 
   const isDiscover = pathname.startsWith('/discover');
@@ -21,8 +20,7 @@ export const BottomTabBar = () => {
   const isSaved = pathname.startsWith('/saved');
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 w-full h-14 bg-sb-bg border-t border-sb-border flex items-center justify-around z-80 font-sans select-none">
-      {/* Discover Tab */}
+    <div className="md:hidden fixed bottom-0 left-0 w-full h-14 bg-white/90 backdrop-blur-md border-t border-sky-100 flex items-center justify-around z-40 font-sans select-none">
       <Link
         href="/discover"
         className="flex flex-col items-center justify-center w-full h-full gap-0.5"
@@ -30,15 +28,14 @@ export const BottomTabBar = () => {
         <Music
           className={clsx(
             'w-5 h-5 transition-colors',
-            isDiscover ? 'text-sb-primary' : 'text-sb-muted'
+            isDiscover ? 'text-sky-500' : 'text-slate-400',
           )}
         />
         {isDiscover && (
-          <span className="text-[10px] font-medium text-sb-primary">Discover</span>
+          <span className="text-[10px] font-semibold text-sky-600">Discover</span>
         )}
       </Link>
 
-      {/* Create Tab */}
       <Link
         href="/create"
         className="flex flex-col items-center justify-center w-full h-full gap-0.5"
@@ -46,15 +43,14 @@ export const BottomTabBar = () => {
         <SlidersHorizontal
           className={clsx(
             'w-5 h-5 transition-colors',
-            isCreate ? 'text-sb-primary' : 'text-sb-muted'
+            isCreate ? 'text-sky-500' : 'text-slate-400',
           )}
         />
         {isCreate && (
-          <span className="text-[10px] font-medium text-sb-primary">Create</span>
+          <span className="text-[10px] font-semibold text-sky-600">Create</span>
         )}
       </Link>
 
-      {/* Saved Tab - MVP redirects to login */}
       <Link
         href="/auth/login"
         className="flex flex-col items-center justify-center w-full h-full gap-0.5"
@@ -62,11 +58,11 @@ export const BottomTabBar = () => {
         <Heart
           className={clsx(
             'w-5 h-5 transition-colors',
-            isSaved ? 'text-sb-primary' : 'text-sb-muted'
+            isSaved ? 'text-sky-500' : 'text-slate-400',
           )}
         />
         {isSaved && (
-          <span className="text-[10px] font-medium text-sb-primary">{t('tab_saved')}</span>
+          <span className="text-[10px] font-semibold text-sky-600">{t('tab_saved')}</span>
         )}
       </Link>
     </div>

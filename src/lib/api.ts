@@ -62,6 +62,7 @@ interface ApiTrack {
   title_en?: string | null;
   artist: string;
   instrument: string;
+  genre?: string | null;
   jangdan: string;
   emotion_tags: string[];
   bpm: number;
@@ -98,6 +99,7 @@ function mapTrack(track: ApiTrack): GugakTrack {
     titleEn: track.title_en ?? undefined,
     artist: track.artist,
     instrument: track.instrument,
+    genre: track.genre ?? undefined,
     jangdan: track.jangdan,
     emotionTags: track.emotion_tags,
     bpm: track.bpm,
@@ -278,7 +280,7 @@ function mapSuggestion(item: ApiSuggestResponse['suggestions'][number]): TrackSu
 
 export async function suggestReleasedTracks(query: string, limit = 8): Promise<TrackSuggestion[]> {
   const q = query.trim();
-  if (q.length < 2) {
+  if (!q) {
     return [];
   }
   const params = new URLSearchParams({ q, limit: String(limit) });
@@ -293,9 +295,32 @@ export async function getPopularTracks(limit = 6): Promise<PopularTracksResult> 
       const tracks = await apiFetch<ApiTrack[]>(`/discover/popular?limit=${limit}`);
       return tracks.map(mapTrack);
     },
-    () => MOCK_TRACKS.slice(0, limit),
+    () => pickDiversePopularTracks(MOCK_TRACKS, limit),
   );
   return { tracks: data, source };
+}
+
+function pickDiversePopularTracks(tracks: GugakTrack[], limit: number): GugakTrack[] {
+  const byGenre = new Map<string, GugakTrack>();
+  for (const track of tracks) {
+    const key = (track.genre || track.instrument).trim();
+    if (key && !byGenre.has(key)) {
+      byGenre.set(key, track);
+    }
+  }
+  const diverse = [...byGenre.values()];
+  if (diverse.length >= limit) {
+    return diverse.slice(0, limit);
+  }
+  const used = new Set(diverse.map((t) => t.id));
+  for (const track of tracks) {
+    if (diverse.length >= limit) break;
+    if (!used.has(track.id)) {
+      diverse.push(track);
+      used.add(track.id);
+    }
+  }
+  return diverse;
 }
 
 export async function discoverTracks(input: string, lang = 'ko'): Promise<DiscoverResult> {
@@ -395,6 +420,7 @@ const MOCK_TRACKS: GugakTrack[] = [
     titleEn: 'Gayageum melody on the Silk Road',
     artist: '국립국악원',
     instrument: '가야금',
+    genre: '풍류음악',
     jangdan: '굿거리',
     emotionTags: ['서정', '차분', '신비'],
     bpm: 85,
@@ -419,6 +445,7 @@ const MOCK_TRACKS: GugakTrack[] = [
     titleEn: 'Daegeum solo in Jajinmori during a peaceful reign',
     artist: '국립국악원',
     instrument: '대금',
+    genre: '궁중음악',
     jangdan: '자진모리',
     emotionTags: ['신남', '웅장', '신비'],
     bpm: 110,
@@ -443,6 +470,7 @@ const MOCK_TRACKS: GugakTrack[] = [
     titleEn: 'Haegeum tune as the morning mist clears',
     artist: '국립국악원',
     instrument: '해금',
+    genre: '민요',
     jangdan: '중모리',
     emotionTags: ['슬픔', '차분', '서정'],
     bpm: 72,
@@ -467,6 +495,7 @@ const MOCK_TRACKS: GugakTrack[] = [
     titleEn: "Wind's Eotmori Piri loop",
     artist: '국립국악원',
     instrument: '피리',
+    genre: '풍류음악',
     jangdan: '엇모리',
     emotionTags: ['신비', '웅장', '차분'],
     bpm: 95,
@@ -490,6 +519,7 @@ const MOCK_TRACKS: GugakTrack[] = [
     titleEn: 'Ajaeng ensemble winding through Hwimori',
     artist: '국립국악원',
     instrument: '아쟁',
+    genre: '판소리',
     jangdan: '휘모리',
     emotionTags: ['웅장', '신남', '슬픔'],
     bpm: 135,

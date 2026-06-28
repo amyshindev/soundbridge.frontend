@@ -23,25 +23,21 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
-      <body className="min-h-full flex flex-col bg-sb-bg text-sb-primary antialiased font-sans">
+      <body className="min-h-screen flex flex-col text-slate-900 antialiased font-sans">
+        <div className="sb-page-bg" aria-hidden="true" />
         <ToastProvider>
           <LocaleProvider>
             <PlayerProvider>
-            {/* GNB */}
             <Navbar />
 
-            {/* Main Content Area */}
-            <main className="flex-1 pb-[72px] md:pb-[56px]">
+            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-28">
               {children}
             </main>
 
-            {/* Footer */}
             <Footer />
 
-            {/* Floating Audio Player */}
             <PlayerBar />
 
-            {/* Mobile Bottom Tabbar */}
             <BottomTabBar />
             </PlayerProvider>
           </LocaleProvider>

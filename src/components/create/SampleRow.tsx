@@ -5,15 +5,24 @@ import { Sample } from '@/types/sample';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useToast } from '@/hooks/useToast';
 import { useLocale } from '@/context/LocaleContext';
-import { labelTrackTitle } from '@/lib/i18n/labels';
+import { labelInstrument, labelJangdan, labelTrackTitle } from '@/lib/i18n/labels';
 import { audioFilenameExtension, resolveAudioUrl } from '@/lib/audioUrl';
-import { MiniWaveform } from './MiniWaveform';
 import { LoopBadge } from './LoopBadge';
 import { LicenseBadge } from './LicenseBadge';
 import { Play, Pause, Download } from 'lucide-react';
 
 export interface SampleRowProps {
   sample: Sample;
+}
+
+function mockBars(seed: string, count = 40): number[] {
+  let s = 0;
+  for (let i = 0; i < seed.length; i++) s += seed.charCodeAt(i);
+  return Array.from({ length: count }).map((_, i) => {
+    const v = Math.sin(s + i * 17) * 10000;
+    const n = v - Math.floor(v);
+    return 24 + n * 68;
+  });
 }
 
 export const SampleRow = ({ sample }: SampleRowProps) => {
@@ -23,14 +32,13 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
 
   const isCurrent = currentTrack?.id === sample.id;
   const isCurrentlyPlaying = isCurrent && isPlaying;
+  const bars = mockBars(sample.audioUrl || sample.id);
+  const duration = 60;
 
   const handlePlayToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isCurrentlyPlaying) {
-      pause();
-    } else {
-      play(sample, 'create');
-    }
+    if (isCurrentlyPlaying) pause();
+    else play(sample, 'create');
   };
 
   const handleDownload = (e: React.MouseEvent) => {
@@ -47,59 +55,76 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
   };
 
   return (
-    <div className="w-full flex items-center justify-between gap-3 px-[14px] py-[10px] border border-sb-border rounded-[10px] bg-sb-bg font-sans select-none hover:border-sb-accent/30 transition-colors">
-      {/* Left Area - Play Button & Title */}
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        {/* Play/Pause Button */}
+    <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 hover:border-sky-200 transition-colors flex flex-col sm:flex-row gap-5 items-start sm:items-center group">
+      <div className="flex gap-4 items-center w-full sm:w-auto">
         <button
+          type="button"
           onClick={handlePlayToggle}
-          className="w-8 h-8 rounded-full bg-sb-primary text-sb-bg flex items-center justify-center hover:bg-[#333333] transition-transform active:scale-95 shrink-0 focus:outline-none"
+          className="w-12 h-12 shrink-0 rounded-full bg-sky-50 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors"
         >
           {isCurrentlyPlaying ? (
-            <Pause className="w-3.5 h-3.5 fill-sb-bg text-sb-bg" />
+            <Pause size={20} fill="currentColor" />
           ) : (
-            <Play className="w-3.5 h-3.5 fill-sb-bg text-sb-bg translate-x-[0.5px]" />
+            <Play size={20} fill="currentColor" className="ml-0.5" />
           )}
         </button>
 
-        {/* Info */}
-        <div className="flex flex-col min-w-0">
-          <span
-            className="text-[13px] font-medium text-sb-primary truncate"
-            title={labelTrackTitle(locale, sample.title, sample.titleEn)}
-          >
+        <div className="flex-1 min-w-0 sm:w-48">
+          <h4 className="font-bold text-slate-900 text-base truncate">
             {labelTrackTitle(locale, sample.title, sample.titleEn)}
-          </span>
-          <span className="text-[10px] text-sb-muted font-normal">
-            {t('create_measures_meta', {
-              measures: sample.measures,
-              bpm: sample.bpm,
-              key: sample.key,
-            })}
-          </span>
+          </h4>
+          <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5">
+            <span className="truncate">{labelInstrument(locale, sample.instrument)}</span>
+            <span>·</span>
+            <span className="shrink-0">{sample.bpm} BPM</span>
+          </div>
         </div>
       </div>
 
-      {/* Right Area - Waveform, Badges & Download */}
-      <div className="flex items-center gap-2.5 shrink-0 select-none">
-        {/* Mini Waveform */}
-        <MiniWaveform
-          audioUrl={sample.audioUrl}
-          cuePoints={sample.cuePoints}
-          duration={30} // default mock duration for visualization
-        />
+      <div className="flex-1 w-full h-12 relative flex items-center gap-[2px] opacity-60 group-hover:opacity-100 transition-opacity">
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            className={`flex-1 rounded-full ${
+              isCurrentlyPlaying ? 'bg-sky-400' : 'bg-slate-200'
+            }`}
+            style={{ height: `${h}%` }}
+          />
+        ))}
+        {sample.cuePoints?.map((cue, i) => {
+          const leftPercent = duration > 0 ? (cue.timeSec / duration) * 100 : 0;
+          return (
+            <div
+              key={`${cue.label}-${i}`}
+              className="absolute top-0 bottom-0 w-px bg-sky-500 z-10"
+              style={{ left: `${Math.min(leftPercent, 95)}%` }}
+            >
+              <div className="absolute -top-3 -translate-x-1/2 bg-sky-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">
+                {cue.label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-        {/* Badges */}
-        <LoopBadge beats={sample.loopUnitBeats} />
-        <LicenseBadge licenseType={sample.publicLicenseType} />
+      <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="flex flex-col items-start sm:items-end gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <LoopBadge beats={sample.loopUnitBeats} />
+            <LicenseBadge licenseType={sample.publicLicenseType} />
+          </div>
+          <div className="text-[10px] text-slate-400 font-medium">
+            {labelJangdan(locale, sample.jangdan)}
+          </div>
+        </div>
 
-        {/* Download Button */}
         <button
+          type="button"
           onClick={handleDownload}
-          className="w-8 h-8 rounded-lg border border-sb-border hover:bg-sb-surface text-sb-primary flex items-center justify-center transition-colors shrink-0"
+          className="w-10 h-10 rounded-full border border-slate-200 text-slate-500 flex items-center justify-center hover:bg-slate-50 hover:text-slate-900 transition-colors shrink-0"
           title={t('sample_download_title')}
         >
-          <Download className="w-3.5 h-3.5" />
+          <Download size={18} />
         </button>
       </div>
     </div>

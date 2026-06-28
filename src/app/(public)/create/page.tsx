@@ -26,7 +26,6 @@ function mapPresetInstrument(raw: string | null | undefined): string | null {
   if (!raw) return null;
   if ((CREATE_INSTRUMENTS as readonly string[]).includes(raw)) return raw;
   if (raw === '판소리') return '판소리';
-  // DISCOVER mock 악기명(가야금 등) → TM 가창
   return '가창';
 }
 
@@ -35,7 +34,6 @@ const CreateContent = () => {
   const { locale, t } = useLocale();
 
   const [filters, setFilters] = useState<CreateFilter>(DEFAULT_FILTERS);
-
   const [showPresetBanner, setShowPresetBanner] = useState(false);
   const [samples, setSamples] = useState<Sample[]>([]);
   const [total, setTotal] = useState(0);
@@ -96,14 +94,12 @@ const CreateContent = () => {
     }
     if (filters.loopUnit !== null) {
       summary.push(`${filters.loopUnit}${t('create_beats_suffix')}`);
-    } else {
-      summary.push(t('create_summary_all_beats'));
     }
     if (filters.license !== 'all') {
       summary.push(
         filters.license === 'commercial'
           ? t('create_summary_commercial')
-          : t('create_summary_attribution')
+          : t('create_summary_attribution'),
       );
     }
     return summary.join(' · ');
@@ -115,8 +111,17 @@ const CreateContent = () => {
   };
 
   return (
-    <div className="max-w-[1080px] mx-auto min-h-[calc(100vh-140px)] flex flex-col md:flex-row font-sans">
-      <div className="w-full md:w-[240px] shrink-0 border-b md:border-b-0 md:border-r border-sb-border/60">
+    <div className="flex flex-col gap-6 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">샘플 라이브러리</h1>
+          <p className="text-slate-500 text-sm">
+            루프 단위, BPM, 악기별로 국악 샘플을 찾고 프로젝트에 추가하세요.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
         <FilterPanel
           filters={filters}
           onChange={setFilters}
@@ -124,9 +129,7 @@ const CreateContent = () => {
           showPresetBanner={showPresetBanner}
           onClosePresetBanner={() => setShowPresetBanner(false)}
         />
-      </div>
 
-      <div className="flex-1 flex flex-col min-w-0">
         <SamplePanel
           samples={samples}
           total={total}
@@ -142,9 +145,9 @@ const CreateContent = () => {
 function CreateFallback() {
   const { t } = useLocale();
   return (
-    <div className="max-w-[1080px] mx-auto min-h-[400px] flex flex-col items-center justify-center">
-      <div className="w-5 h-5 border-2 border-sb-primary border-t-transparent rounded-full animate-spin mb-3" />
-      <span className="text-[12px] text-sb-muted font-sans animate-pulse">{t('common_loading')}</span>
+    <div className="max-w-5xl mx-auto min-h-[400px] flex flex-col items-center justify-center">
+      <div className="w-8 h-8 border-4 border-sky-100 border-t-sky-500 rounded-full animate-spin mb-3" />
+      <span className="text-sm text-slate-500 animate-pulse">{t('common_loading')}</span>
     </div>
   );
 }

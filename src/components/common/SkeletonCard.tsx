@@ -11,34 +11,22 @@ export const SkeletonCard = ({ className = '' }: SkeletonCardProps) => {
     <div
       className={twMerge(
         clsx(
-          'w-full border border-sb-border rounded-xl bg-sb-bg overflow-hidden font-sans',
-          className
-        )
+          'w-full rounded-3xl bg-white border border-sky-50/50 p-5 overflow-hidden font-sans',
+          className,
+        ),
       )}
     >
-      {/* Thumbnail Area skeleton */}
-      <div className="h-[88px] bg-sb-surface animate-pulse" />
-
-      {/* Body Area skeleton */}
-      <div className="p-[14px] flex flex-col gap-3">
-        {/* Instrument & Title */}
-        <div className="flex flex-col gap-1.5">
-          <div className="h-2.5 w-16 bg-sb-surface rounded animate-pulse" />
-          <div className="h-4 w-3/4 bg-sb-surface rounded animate-pulse" />
+      <div className="flex gap-4 items-start">
+        <div className="w-24 h-24 rounded-2xl bg-slate-100 animate-pulse shrink-0" />
+        <div className="flex-1 flex flex-col gap-2 pt-1">
+          <div className="h-3 w-16 bg-slate-100 rounded animate-pulse" />
+          <div className="h-5 w-3/4 bg-slate-100 rounded animate-pulse" />
+          <div className="h-3 w-1/2 bg-slate-100 rounded animate-pulse" />
+          <div className="flex gap-2 mt-2">
+            <div className="h-6 w-14 bg-slate-100 rounded-full animate-pulse" />
+            <div className="h-6 w-14 bg-slate-100 rounded-full animate-pulse" />
+          </div>
         </div>
-
-        {/* Match Badge / Explanation skeleton */}
-        <div className="h-3 w-24 bg-sb-surface rounded animate-pulse" />
-        <div className="h-10 w-full bg-sb-surface rounded-lg animate-pulse" />
-
-        {/* Emotion Tag Chips skeleton */}
-        <div className="flex gap-1.5 flex-wrap mt-1">
-          <div className="h-6 w-12 bg-sb-surface rounded-full animate-pulse" />
-          <div className="h-6 w-12 bg-sb-surface rounded-full animate-pulse" />
-        </div>
-
-        {/* Bridge Button skeleton */}
-        <div className="h-8 w-full bg-sb-surface rounded-lg mt-2 animate-pulse" />
       </div>
     </div>
   );

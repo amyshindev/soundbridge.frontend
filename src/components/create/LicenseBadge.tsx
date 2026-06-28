@@ -15,8 +15,8 @@ export const LicenseBadge = ({ licenseType }: LicenseBadgeProps) => {
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium font-sans select-none shrink-0',
-        isKogl1 ? 'bg-[#EAF2EE] text-sb-green' : 'bg-[#E6EFF8] text-sb-blue'
+        'px-2 py-0.5 rounded text-[10px] font-bold shrink-0',
+        isKogl1 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700',
       )}
     >
       {isKogl1 ? t('create_license_commercial') : t('create_license_attribution')}

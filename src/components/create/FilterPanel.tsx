@@ -5,7 +5,6 @@ import { CreateFilter } from '@/types/api';
 import { CreatePreset } from '@/types/preset';
 import { PresetBanner } from './PresetBanner';
 import { LoopUnitFilter } from './LoopUnitFilter';
-import { Chip } from '../common/Chip';
 import {
   CREATE_GENRES,
   CREATE_INSTRUMENTS,
@@ -15,7 +14,8 @@ import {
 } from '@/lib/constants';
 import { labelEmotion, labelGenre, labelInstrument, labelJangdan } from '@/lib/i18n/labels';
 import { useLocale } from '@/context/LocaleContext';
-import { RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { clsx } from 'clsx';
 
 export interface FilterPanelProps {
   filters: CreateFilter;
@@ -23,6 +23,37 @@ export interface FilterPanelProps {
   preset: CreatePreset;
   showPresetBanner: boolean;
   onClosePresetBanner: () => void;
+}
+
+function FilterChip({
+  label,
+  active,
+  variant = 'default',
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  variant?: 'default' | 'emotion';
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={clsx(
+        'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+        variant === 'emotion'
+          ? active
+            ? 'bg-sky-500 text-white'
+            : 'bg-sky-50 text-sky-700 hover:bg-sky-100'
+          : active
+            ? 'bg-slate-900 text-white'
+            : 'bg-slate-50 text-slate-600 hover:bg-slate-100',
+      )}
+    >
+      {label}
+    </button>
+  );
 }
 
 export const FilterPanel = ({
@@ -48,32 +79,26 @@ export const FilterPanel = ({
       ? filters.jangdans.filter((j) => j !== jangdan)
       : [...filters.jangdans, jangdan];
 
-    // [v4.0] 장단 선택 시 루프 단위 자동 연동
     let newLoopUnit = filters.loopUnit;
     if (!isSelected) {
-      // If newly selected, look up loop unit mapping
       const mappedUnit = JANGDAN_LOOP_MAP[jangdan];
       if (mappedUnit !== undefined) {
         newLoopUnit = mappedUnit;
       }
+    } else if (newJangdans.length === 0) {
+      newLoopUnit = null;
     } else {
-      // If deselected and no jangdans left, reset loop unit to null
-      if (newJangdans.length === 0) {
-        newLoopUnit = null;
-      } else {
-        // Fallback to the loop unit of the remaining last jangdan
-        const lastJangdan = newJangdans[newJangdans.length - 1];
-        const mappedUnit = JANGDAN_LOOP_MAP[lastJangdan];
-        if (mappedUnit !== undefined) {
-          newLoopUnit = mappedUnit;
-        }
+      const lastJangdan = newJangdans[newJangdans.length - 1];
+      const mappedUnit = JANGDAN_LOOP_MAP[lastJangdan];
+      if (mappedUnit !== undefined) {
+        newLoopUnit = mappedUnit;
       }
     }
 
     onChange({
       ...filters,
       jangdans: newJangdans,
-      loopUnit: newLoopUnit
+      loopUnit: newLoopUnit,
     });
   };
 
@@ -125,173 +150,154 @@ export const FilterPanel = ({
   };
 
   return (
-    <div className="w-full h-full bg-sb-bg flex flex-col font-sans select-none border-r border-sb-border/60">
-      {/* Preset Banner at the very top of panel if active */}
+    <div className="w-full lg:w-64 shrink-0 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
       {showPresetBanner && (
-        <div className="px-4 pt-4 shrink-0">
+        <div className="mb-5 -mx-1">
           <PresetBanner preset={preset} onClose={onClosePresetBanner} />
         </div>
       )}
 
-      {/* Filter Sections Scroll Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-6 scrollbar-thin">
-        {/* Section: 음원 유형 (가창/판소리) */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+      <div className="flex items-center gap-2 font-bold text-slate-900 mb-6">
+        <SlidersHorizontal size={18} />
+        <span>필터</span>
+      </div>
+
+      <div className="space-y-6 max-h-[70vh] overflow-y-auto scrollbar-thin pr-1">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_type')}
-          </span>
-          <div className="grid grid-cols-2 gap-1.5">
+          </h4>
+          <div className="flex flex-wrap gap-2">
             {CREATE_INSTRUMENTS.map((inst) => (
-              <Chip
+              <FilterChip
                 key={inst}
                 label={labelInstrument(locale, inst)}
                 active={filters.instruments.includes(inst)}
                 onClick={() => handleInstrumentToggle(inst)}
-                className="py-1 text-[11px]"
               />
             ))}
           </div>
         </div>
 
-        {/* Section: 장르 */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_genre')}
-          </span>
-          <div className="grid grid-cols-2 gap-1.5">
+          </h4>
+          <div className="flex flex-wrap gap-2">
             {CREATE_GENRES.map((genre) => (
-              <Chip
+              <FilterChip
                 key={genre}
                 label={labelGenre(locale, genre)}
                 active={filters.genres.includes(genre)}
                 onClick={() => handleGenreToggle(genre)}
-                className="py-1 text-[11px]"
               />
             ))}
           </div>
         </div>
 
-        {/* Section: Jangdan */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_jangdan')}
-          </span>
-          <div className="grid grid-cols-2 gap-1.5">
+          </h4>
+          <div className="flex flex-wrap gap-2">
             {CREATE_JANGDANS.map((jd) => (
-              <Chip
+              <FilterChip
                 key={jd}
                 label={labelJangdan(locale, jd)}
                 active={filters.jangdans.includes(jd)}
                 onClick={() => handleJangdanToggle(jd)}
-                className="py-1 text-[11px]"
               />
             ))}
           </div>
         </div>
 
-        {/* Section: Emotion */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_emotion')}
-          </span>
-          <div className="grid grid-cols-3 gap-1.5">
+          </h4>
+          <div className="flex flex-wrap gap-2">
             {EMOTIONS.map((em) => (
-              <Chip
+              <FilterChip
                 key={em}
                 label={labelEmotion(locale, em)}
                 active={filters.emotions.includes(em)}
+                variant="emotion"
                 onClick={() => handleEmotionToggle(em)}
-                className="py-1 text-[11px]"
               />
             ))}
           </div>
         </div>
 
-        {/* Section: BPM range */}
-        <div className="flex flex-col gap-2.5">
-          <div className="flex justify-between items-baseline">
-            <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <div className="flex justify-between items-baseline mb-3">
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               {t('create_filter_bpm')}
-            </span>
-            <span className="text-[11px] text-sb-primary font-mono font-medium">
-              {filters.bpmMin} — {filters.bpmMax} BPM
+            </h4>
+            <span className="text-xs text-slate-600 font-medium tabular-nums">
+              {filters.bpmMin} — {filters.bpmMax}
             </span>
           </div>
-          {/* Dual Range Slider container */}
-          <div className="flex flex-col gap-4 px-1 mt-1">
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col flex-1 gap-1">
-                <span className="text-[9px] text-sb-muted font-mono">MIN</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="300"
-                  value={filters.bpmMin}
-                  onChange={handleBpmMinChange}
-                  className="w-full accent-sb-accent h-1 bg-sb-border rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-              <div className="flex flex-col flex-1 gap-1">
-                <span className="text-[9px] text-sb-muted font-mono">MAX</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="300"
-                  value={filters.bpmMax}
-                  onChange={handleBpmMaxChange}
-                  className="w-full accent-sb-accent h-1 bg-sb-border rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-            </div>
+          <div className="flex flex-col gap-3">
+            <input
+              type="range"
+              min="0"
+              max="300"
+              value={filters.bpmMin}
+              onChange={handleBpmMinChange}
+              className="w-full accent-sky-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+            />
+            <input
+              type="range"
+              min="0"
+              max="300"
+              value={filters.bpmMax}
+              onChange={handleBpmMaxChange}
+              className="w-full accent-sky-500 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+            />
           </div>
         </div>
 
-        {/* Section: Loop Unit */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_loop')}
-          </span>
+          </h4>
           <LoopUnitFilter value={filters.loopUnit} onChange={handleLoopUnitChange} />
         </div>
 
-        {/* Section: License */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-[10px] font-bold text-sb-muted uppercase tracking-wider">
+        <div>
+          <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_license')}
-          </span>
-          <div className="flex gap-1.5">
-            <Chip
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
               label={t('create_license_commercial')}
               active={filters.license === 'commercial'}
+              variant="emotion"
               onClick={() => handleLicenseChange('commercial')}
-              className="py-1 px-3 text-[11px]"
             />
-            <Chip
+            <FilterChip
               label={t('create_license_attribution')}
               active={filters.license === 'attribution'}
+              variant="emotion"
               onClick={() => handleLicenseChange('attribution')}
-              className="py-1 px-3 text-[11px]"
             />
-            <Chip
+            <FilterChip
               label={t('create_license_all')}
               active={filters.license === 'all'}
               onClick={() => handleLicenseChange('all')}
-              className="py-1 px-3 text-[11px]"
             />
           </div>
         </div>
       </div>
 
-      {/* Bottom section: Reset button */}
-      <div className="p-4 border-t border-sb-border/40 shrink-0">
-        <button
-          onClick={handleReset}
-          className="w-full flex items-center justify-center gap-1.5 text-sb-muted hover:text-sb-primary text-[12px] font-medium transition-colors py-2 rounded-lg hover:bg-sb-surface"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>{t('create_reset_filters')}</span>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={handleReset}
+        className="w-full mt-6 flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors py-2 rounded-lg hover:bg-slate-50"
+      >
+        <RotateCcw className="w-3.5 h-3.5" />
+        <span>{t('create_reset_filters')}</span>
+      </button>
     </div>
   );
 };

@@ -23,22 +23,22 @@ export const SearchSuggestions = ({
   emptyLabel,
   loadingLabel,
 }: SearchSuggestionsProps) => {
-  if (query.trim().length < 2) {
+  if (!query.trim()) {
     return null;
   }
 
   return (
     <div
-      className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-[10px] border border-sb-primary/15 bg-white shadow-lg"
+      className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
       role="listbox"
       aria-label="곡 검색 제안"
     >
       {isLoading && (
-        <div className="px-4 py-3 text-[13px] text-sb-muted">{loadingLabel}</div>
+        <div className="px-4 py-3 text-sm text-slate-500">{loadingLabel}</div>
       )}
 
       {!isLoading && suggestions.length === 0 && (
-        <div className="px-4 py-3 text-[13px] text-sb-muted">{emptyLabel}</div>
+        <div className="px-4 py-3 text-sm text-slate-500">{emptyLabel}</div>
       )}
 
       {!isLoading &&
@@ -51,23 +51,23 @@ export const SearchSuggestions = ({
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelect(item)}
             className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-              index === activeIndex ? 'bg-sb-accent/10' : 'hover:bg-[#F7F6F3]'
+              index === activeIndex ? 'bg-sky-50' : 'hover:bg-slate-50'
             }`}
           >
             {item.artworkUrl ? (
               <img
                 src={item.artworkUrl}
                 alt=""
-                className="h-10 w-10 shrink-0 rounded-md object-cover bg-[#F0EFEB]"
+                className="h-10 w-10 shrink-0 rounded-lg object-cover bg-sky-50"
               />
             ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#F0EFEB] text-sb-muted">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-400">
                 <Music2 className="h-4 w-4" />
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[14px] font-medium text-sb-primary">{item.title}</div>
-              <div className="truncate text-[12px] text-sb-muted">
+              <div className="truncate text-sm font-semibold text-slate-900">{item.title}</div>
+              <div className="truncate text-xs text-slate-500">
                 {item.artist}
                 {item.album ? ` · ${item.album}` : ''}
               </div>

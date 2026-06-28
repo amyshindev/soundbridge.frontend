@@ -19,7 +19,7 @@ export function HomeWithIntro({ popularTracks }: HomeWithIntroProps) {
   }, []);
 
   if (phase === 'pending') {
-    return <div className="min-h-[calc(100dvh-3.5rem)] bg-sb-bg" aria-busy="true" />;
+    return <div className="min-h-[calc(100dvh-4rem)]" aria-busy="true" />;
   }
 
   return (

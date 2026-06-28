@@ -10,6 +10,8 @@ export interface GugakTrack {
   titleEn?: string;
   artist: string;
   instrument: string;
+  /** TM genre_mclsf (궁중음악, 풍류음악, 판소리, 민요, 불교음악 등) */
+  genre?: string;
   // [v4.0] jangdan: 백엔드 gugak_tracks.jangdan_name FK 값 (예: "자진모리")
   jangdan: string;
   // [v4.0] emotionTags: 백엔드 track_emotion_tags 테이블에서 JOIN, sort_order 순으로 직렬화된 배열

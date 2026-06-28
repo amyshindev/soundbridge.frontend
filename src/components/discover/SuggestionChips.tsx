@@ -2,40 +2,50 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Chip } from '../common/Chip';
 import { useLocale } from '@/context/LocaleContext';
+import {
+  type DiscoverSearchMode,
+  buildDiscoverHref,
+  MOOD_SUGGESTION_CHIPS,
+  SONG_SUGGESTION_CHIPS,
+} from '@/lib/discoverSearch';
 
 export interface SuggestionChipsProps {
   size?: 'default' | 'large';
+  mode?: DiscoverSearchMode;
 }
 
-export const SuggestionChips = ({ size = 'default' }: SuggestionChipsProps) => {
+export const SuggestionChips = ({ size = 'default', mode = 'song' }: SuggestionChipsProps) => {
   const router = useRouter();
   const { t } = useLocale();
-  const suggestions = ['Coldplay', '아이유', 'Billie Eilish', '재즈', '클래식'];
+  const suggestions = mode === 'mood' ? MOOD_SUGGESTION_CHIPS : SONG_SUGGESTION_CHIPS;
 
   const handleClick = (value: string) => {
-    router.push(`/discover?q=${encodeURIComponent(value)}`);
+    router.push(buildDiscoverHref(value, mode));
   };
 
   const isLarge = size === 'large';
 
   return (
-    <div className={`flex flex-wrap items-center justify-center font-sans select-none ${isLarge ? 'gap-2' : 'gap-1.5'}`}>
-      <span className={`text-sb-muted mr-1 ${isLarge ? 'text-[13px] md:text-[14px]' : 'text-[11px]'}`}>
+    <div
+      className={`flex flex-wrap items-center justify-center font-sans select-none ${
+        isLarge ? 'gap-2' : 'gap-1.5'
+      }`}
+    >
+      <span className={`text-slate-400 mr-1 ${isLarge ? 'text-sm' : 'text-xs'}`}>
         {t('suggestion_label')}
       </span>
       {suggestions.map((item) => (
-        <Chip
+        <button
           key={item}
-          label={item}
-          variant="default"
-          active={false}
+          type="button"
           onClick={() => handleClick(item)}
-          className={`border-sb-border text-sb-muted hover:border-sb-muted ${
-            isLarge ? 'py-1 px-3 text-[13px] md:text-[14px]' : 'py-[3px] px-2.5 text-[11px]'
+          className={`rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-700 transition-colors font-medium ${
+            isLarge ? 'py-1 px-3 text-sm' : 'py-0.5 px-2.5 text-xs'
           }`}
-        />
+        >
+          {item}
+        </button>
       ))}
     </div>
   );

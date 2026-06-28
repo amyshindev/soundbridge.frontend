@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Chip } from '../common/Chip';
 import { useLocale } from '@/context/LocaleContext';
+import { clsx } from 'clsx';
 
 export interface LoopUnitFilterProps {
   value: number | null;
@@ -20,16 +20,21 @@ export const LoopUnitFilter = ({ value, onChange }: LoopUnitFilterProps) => {
   ];
 
   return (
-    <div className="flex flex-wrap gap-1.5 font-sans">
+    <div className="flex flex-wrap gap-2">
       {options.map((opt) => (
-        <Chip
+        <button
           key={opt.label}
-          label={opt.label}
-          variant="gold"
-          active={value === opt.value}
+          type="button"
           onClick={() => onChange(opt.value)}
-          className="py-1 px-2.5 text-[11px]"
-        />
+          className={clsx(
+            'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+            value === opt.value
+              ? 'bg-slate-900 text-white'
+              : 'bg-slate-50 text-slate-600 hover:bg-slate-100',
+          )}
+        >
+          {opt.label}
+        </button>
       ))}
     </div>
   );
