@@ -208,7 +208,7 @@ export const SearchBar = ({
         <SearchModeToggle mode={mode} onChange={handleModeChange} />
       )}
 
-      <div className="relative w-full flex flex-col gap-1">
+      <div className="relative w-full">
         <form onSubmit={handleSubmit} className="relative w-full">
           <div
             className={`relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-shadow focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${
@@ -264,7 +264,7 @@ export const SearchBar = ({
           </div>
         </form>
 
-        <p className="text-[11px] text-slate-400 text-center tracking-wide select-none">
+        <p className="mt-2.5 text-[11px] text-slate-400 text-right pr-1 tracking-wide select-none">
           {t('search_powered_by')}
         </p>
       </div>
