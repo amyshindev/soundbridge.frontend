@@ -1,42 +1,69 @@
-/** TM genre_mclsf — 커버 그라데이션·배지 색상 */
-export const GENRE_THEME: Record<
-  string,
-  { coverGradient: string; badgeClass: string; playAccentClass: string }
-> = {
+import type { CSSProperties } from 'react';
+
+export type GenreTheme = {
+  coverStyle: CSSProperties;
+  badgeStyle: CSSProperties;
+  playColor: string;
+};
+
+export const GENRE_THEME: Record<string, GenreTheme> = {
   궁중음악: {
-    coverGradient: 'from-amber-400 to-yellow-600',
-    badgeClass: 'bg-amber-50 text-amber-800 border border-amber-100',
-    playAccentClass: 'text-amber-600',
+    coverStyle: { background: 'linear-gradient(135deg, #fbbf24 0%, #ca8a04 100%)' },
+    badgeStyle: { backgroundColor: '#fffbeb', color: '#92400e', border: '1px solid #fde68a' },
+    playColor: '#d97706',
   },
   풍류음악: {
-    coverGradient: 'from-emerald-400 to-teal-600',
-    badgeClass: 'bg-emerald-50 text-emerald-800 border border-emerald-100',
-    playAccentClass: 'text-emerald-600',
+    coverStyle: { background: 'linear-gradient(135deg, #34d399 0%, #0d9488 100%)' },
+    badgeStyle: { backgroundColor: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0' },
+    playColor: '#059669',
   },
   판소리: {
-    coverGradient: 'from-violet-500 to-purple-700',
-    badgeClass: 'bg-violet-50 text-violet-800 border border-violet-100',
-    playAccentClass: 'text-violet-600',
+    coverStyle: { background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)' },
+    badgeStyle: { backgroundColor: '#f5f3ff', color: '#5b21b6', border: '1px solid #ddd6fe' },
+    playColor: '#7c3aed',
   },
   민요: {
-    coverGradient: 'from-rose-400 to-orange-500',
-    badgeClass: 'bg-rose-50 text-rose-800 border border-rose-100',
-    playAccentClass: 'text-rose-600',
+    coverStyle: { background: 'linear-gradient(135deg, #fb7185 0%, #f97316 100%)' },
+    badgeStyle: { backgroundColor: '#fff1f2', color: '#9f1239', border: '1px solid #fecdd3' },
+    playColor: '#e11d48',
   },
   불교음악: {
-    coverGradient: 'from-indigo-400 to-slate-600',
-    badgeClass: 'bg-indigo-50 text-indigo-800 border border-indigo-100',
-    playAccentClass: 'text-indigo-600',
+    coverStyle: { background: 'linear-gradient(135deg, #818cf8 0%, #475569 100%)' },
+    badgeStyle: { backgroundColor: '#eef2ff', color: '#3730a3', border: '1px solid #c7d2fe' },
+    playColor: '#4f46e5',
   },
 };
 
-const DEFAULT_THEME = {
-  coverGradient: 'from-sky-400 to-cyan-500',
-  badgeClass: 'bg-sky-50 text-sky-600 border border-sky-100',
-  playAccentClass: 'text-sky-500',
+const DEFAULT_THEME: GenreTheme = {
+  coverStyle: { background: 'linear-gradient(135deg, #38bdf8 0%, #06b6d4 100%)' },
+  badgeStyle: { backgroundColor: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd' },
+  playColor: '#0ea5e9',
 };
 
-export function getGenreTheme(genre?: string | null) {
-  if (!genre) return DEFAULT_THEME;
-  return GENRE_THEME[genre] ?? DEFAULT_THEME;
+const INSTRUMENT_COVER: Record<string, CSSProperties> = {
+  가야금: { background: 'linear-gradient(135deg, #38bdf8 0%, #06b6d4 100%)' },
+  거문고: { background: 'linear-gradient(135deg, #818cf8 0%, #7c3aed 100%)' },
+  대금: { background: 'linear-gradient(135deg, #2dd4bf 0%, #059669 100%)' },
+  해금: { background: 'linear-gradient(135deg, #fb7185 0%, #ec4899 100%)' },
+  피리: { background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)' },
+  아쟁: { background: 'linear-gradient(135deg, #e879f9 0%, #a855f7 100%)' },
+  장구: { background: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' },
+  소고: { background: 'linear-gradient(135deg, #a3e635 0%, #16a34a 100%)' },
+  가창: { background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)' },
+  판소리: { background: 'linear-gradient(135deg, #8b5cf6 0%, #4f46e5 100%)' },
+};
+
+export function getGenreTheme(genre?: string | null): GenreTheme {
+  if (!genre?.trim()) return DEFAULT_THEME;
+  return GENRE_THEME[genre.trim()] ?? DEFAULT_THEME;
+}
+
+export function getCoverStyle(genre?: string | null, instrument?: string): CSSProperties {
+  if (genre?.trim() && GENRE_THEME[genre.trim()]) {
+    return GENRE_THEME[genre.trim()].coverStyle;
+  }
+  if (instrument && INSTRUMENT_COVER[instrument]) {
+    return INSTRUMENT_COVER[instrument];
+  }
+  return DEFAULT_THEME.coverStyle;
 }

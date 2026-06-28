@@ -38,6 +38,7 @@ export const PlayerBar = () => {
         <div className="flex items-center gap-4 flex-1 min-w-0">
           <TrackCover
             instrument={currentTrack.instrument}
+            genre={currentTrack.genre}
             className="w-12 h-12 rounded-lg shrink-0"
             iconClassName="w-5 h-5"
           />

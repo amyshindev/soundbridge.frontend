@@ -10,6 +10,7 @@ import { usePlayer } from '@/hooks/usePlayer';
 import { useLocale } from '@/context/LocaleContext';
 import { labelEmotion, labelGenre, labelInstrument, labelTrackTitle } from '@/lib/i18n/labels';
 import { buildCreatePresetUrl } from '@/lib/presetUrl';
+import { getGenreTheme } from '@/lib/genreTheme';
 import { TrackCover } from '../common/TrackCover';
 
 export interface ResultCardProps {
@@ -38,6 +39,7 @@ export const ResultCard = ({
   const categoryLabel = track.genre
     ? labelGenre(locale, track.genre)
     : labelInstrument(locale, track.instrument);
+  const genreTheme = getGenreTheme(track.genre);
 
   const presetHref =
     track.presetUrl ||
@@ -67,6 +69,7 @@ export const ResultCard = ({
         <div className="relative group w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl overflow-hidden shadow-sm">
           <TrackCover
             instrument={track.instrument}
+            genre={track.genre}
             title={track.title}
             className="w-full h-full rounded-2xl"
             iconClassName="w-8 h-8"
@@ -76,7 +79,10 @@ export const ResultCard = ({
             onClick={handlePlayToggle}
             className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <div className="w-10 h-10 rounded-full bg-white/90 text-sky-500 flex items-center justify-center shadow-lg backdrop-blur-sm">
+            <div
+              className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg backdrop-blur-sm"
+              style={{ color: genreTheme.playColor }}
+            >
               {isCurrentlyPlaying ? (
                 <Pause size={18} fill="currentColor" />
               ) : (
@@ -88,7 +94,10 @@ export const ResultCard = ({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 bg-sky-50 text-sky-600 rounded-md text-[10px] sm:text-xs font-semibold">
+            <span
+              className="px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold"
+              style={genreTheme.badgeStyle}
+            >
               {categoryLabel}
             </span>
             <span className="text-slate-400 text-xs">{track.bpm} BPM</span>
