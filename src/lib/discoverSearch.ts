@@ -25,11 +25,13 @@ export function saveDiscoverMode(mode: DiscoverSearchMode): void {
   }
 }
 
+/** 검색 실행마다 `_r`을 넣어 동일 검색어도 useEffect가 다시 돌게 함 */
 export function buildDiscoverHref(q: string, mode: DiscoverSearchMode): string {
   const params = new URLSearchParams({ mode });
   const trimmed = q.trim();
   if (trimmed) {
     params.set('q', trimmed);
+    params.set('_r', String(Date.now()));
   }
   return `/discover?${params.toString()}`;
 }

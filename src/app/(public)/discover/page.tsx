@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SearchBar } from '@/components/discover/SearchBar';
 import { SuggestionChips } from '@/components/discover/SuggestionChips';
@@ -22,15 +22,18 @@ const DiscoverContent = () => {
   const { locale, t } = useLocale();
   const query = searchParams.get('q') || '';
   const mode = parseDiscoverMode(searchParams.get('mode'));
+  const refreshKey = searchParams.get('_r') ?? '';
 
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [inputSummary, setInputSummary] = useState('');
   const [popularTracks, setPopularTracks] = useState<GugakTrack[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [searchNonce, setSearchNonce] = useState(0);
+  const fetchGeneration = useRef(0);
 
   useEffect(() => {
+    const generation = ++fetchGeneration.current;
+
     const fetchResults = async () => {
       if (!query) {
         setResults([]);
@@ -39,11 +42,14 @@ const DiscoverContent = () => {
         try {
           setIsLoading(true);
           const popular = await getPopularTracks();
+          if (generation !== fetchGeneration.current) return;
           setPopularTracks(popular.tracks);
         } catch (e) {
           console.error(e);
         } finally {
-          setIsLoading(false);
+          if (generation === fetchGeneration.current) {
+            setIsLoading(false);
+          }
         }
         return;
       }
@@ -52,9 +58,11 @@ const DiscoverContent = () => {
       setSearchError(null);
       try {
         const data = await discoverTracks(query, locale);
+        if (generation !== fetchGeneration.current) return;
         setResults(data.tracks);
         setInputSummary(formatDiscoverSummary(query, mode, locale, data.inputSummary));
       } catch (e) {
+        if (generation !== fetchGeneration.current) return;
         console.error('Search failed', e);
         setResults([]);
         if (e instanceof ApiError && e.status === 503) {
@@ -70,12 +78,14 @@ const DiscoverContent = () => {
           setSearchError(t('discover_error_generic'));
         }
       } finally {
-        setIsLoading(false);
+        if (generation === fetchGeneration.current) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchResults();
-  }, [query, locale, mode, t, searchNonce]);
+  }, [query, locale, mode, t, refreshKey]);
 
   const handleResetSearch = () => {
     router.push(buildDiscoverHref('', mode));
@@ -83,7 +93,7 @@ const DiscoverContent = () => {
 
   const handleRetry = () => {
     if (query) {
-      setSearchNonce((n) => n + 1);
+      router.push(buildDiscoverHref(query, mode));
     } else {
       router.refresh();
     }
@@ -138,7 +148,6 @@ const DiscoverContent = () => {
             initialMode={mode}
             size="large"
             isSearching={isLoading && !!query}
-            onRepeatSearch={() => setSearchNonce((n) => n + 1)}
           />
         </div>
 

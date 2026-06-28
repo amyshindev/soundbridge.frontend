@@ -25,8 +25,6 @@ export interface SearchBarProps {
   isSearching?: boolean;
   showModeToggle?: boolean;
   onModeChange?: (mode: DiscoverSearchMode) => void;
-  /** /discover 에서 동일 검색어로 다시 찾기 */
-  onRepeatSearch?: () => void;
 }
 
 const DEBOUNCE_MS = 300;
@@ -39,7 +37,6 @@ export const SearchBar = ({
   isSearching = false,
   showModeToggle = true,
   onModeChange,
-  onRepeatSearch,
 }: SearchBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -84,17 +81,9 @@ export const SearchBar = ({
       if (!trimmed) return;
       if (searchMode === 'mood' && trimmed.length < MOOD_SEARCH_MIN_LENGTH) return;
       setIsOpen(false);
-
-      const currentQ = (searchParams.get('q') ?? '').trim();
-      const currentMode = parseDiscoverMode(searchParams.get('mode'));
-      if (isDiscoverPage && trimmed === currentQ && searchMode === currentMode) {
-        onRepeatSearch?.();
-        return;
-      }
-
       router.push(buildDiscoverHref(trimmed, searchMode));
     },
-    [router, mode, isDiscoverPage, searchParams, onRepeatSearch],
+    [router, mode],
   );
 
   const handleModeChange = useCallback(
@@ -259,7 +248,8 @@ export const SearchBar = ({
           />
           <button
             type="submit"
-            disabled={!canSubmit || isSearching}
+            disabled={!canSubmit}
+            aria-busy={isSearching}
             className={`bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:hover:bg-sky-500 text-white rounded-xl font-semibold transition-colors shrink-0 flex items-center gap-2 ${
               isLarge ? 'px-6 sm:px-8 py-3.5' : 'px-5 py-2.5 text-sm'
             }`}
