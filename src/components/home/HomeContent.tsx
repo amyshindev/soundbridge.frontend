@@ -33,7 +33,7 @@ export function HomeContent({ popularTracks }: HomeContentProps) {
 
   return (
     <div className="w-full font-sans">
-      <section className="relative overflow-hidden min-h-[calc(100dvh-4rem)] px-4 pb-20 md:pb-0 flex flex-col items-center justify-center text-center">
+      <section className="relative overflow-hidden min-h-[calc(100dvh-3.5rem-3.5rem)] md:min-h-[calc(100dvh-4rem)] px-2 sm:px-4 pb-16 md:pb-0 flex flex-col items-center justify-center text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-xs font-semibold mb-6 z-10">
           <Sparkles size={14} className="text-sky-500" />
           <span>AI 음악 감성 번역기</span>
@@ -44,7 +44,7 @@ export function HomeContent({ popularTracks }: HomeContentProps) {
             'font-extrabold text-slate-900 tracking-normal leading-tight mb-5 md:mb-6 z-10 text-center',
             locale === 'en'
               ? 'text-[clamp(24px,4.5vw,48px)] max-w-[min(100%,100vw-2rem)]'
-              : 'text-3xl sm:text-5xl max-w-[640px]',
+              : 'text-2xl sm:text-5xl max-w-[640px]',
           )}
         >
           {t('home_hero_title_1')}

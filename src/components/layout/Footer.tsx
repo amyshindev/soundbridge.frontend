@@ -9,9 +9,9 @@ export const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 border-t border-slate-100/80 pb-28 pt-10">
+    <footer className="mt-12 sm:mt-20 border-t border-slate-100/80 pt-8 sm:pt-10 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-        <div>
+        <div className="min-w-0">
           <h5 className="font-bold text-slate-900 mb-2">SoundBridge</h5>
           <p className="text-sm text-slate-500">{t('footer_tagline')}</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-xs text-slate-400">
@@ -28,13 +28,13 @@ export const Footer = () => {
             </Link>
           </div>
         </div>
-        <div className="text-left sm:text-right">
-          <p className="text-xs text-slate-400 mb-1">
+        <div className="text-left sm:text-right min-w-0">
+          <p className="text-xs text-slate-400 mb-1 leading-relaxed">
             본 서비스의 음원은 국립국악원 및 한국문화정보원의 공공데이터를 활용합니다.
           </p>
-          <div className="flex items-center gap-2 sm:justify-end text-xs text-slate-500 font-medium">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:justify-end text-xs text-slate-500 font-medium">
             <span>KOGL 1유형 (출처표시)</span>
-            <span>·</span>
+            <span className="hidden sm:inline">·</span>
             <span>KOGL 2유형 (비상업적 이용)</span>
           </div>
           <p className="text-[10px] text-slate-400 mt-2">{t('footer_copyright', { year })}</p>

@@ -111,17 +111,17 @@ const CreateContent = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
+    <div className="flex flex-col gap-4 sm:gap-6 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-0 sm:mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-1">샘플 라이브러리</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">샘플 라이브러리</h1>
           <p className="text-slate-500 text-sm">
             루프 단위, BPM, 악기별로 국악 샘플을 찾고 프로젝트에 추가하세요.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 items-start">
         <FilterPanel
           filters={filters}
           onChange={setFilters}

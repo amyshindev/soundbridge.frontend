@@ -105,13 +105,13 @@ const DiscoverContent = () => {
   const loadingTitle = mode === 'mood' ? t('discover_loading_mood') : t('discover_loading');
 
   return (
-    <div className="flex flex-col gap-12 sm:gap-16 pb-10 max-w-4xl mx-auto">
-      <section className="text-center pt-4 sm:pt-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-xs font-semibold mb-6">
+    <div className="flex flex-col gap-8 sm:gap-16 pb-6 sm:pb-10 max-w-4xl mx-auto">
+      <section className="text-center pt-2 sm:pt-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-xs font-semibold mb-4 sm:mb-6">
           <Sparkles size={14} className="text-sky-500" />
           <span>AI 음악 감성 번역기</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-normal mb-4 leading-tight">
+        <h1 className="text-2xl sm:text-5xl font-extrabold text-slate-900 tracking-normal mb-3 sm:mb-4 leading-tight px-1">
           {mode === 'mood' ? (
             locale === 'en' ? (
               <>
@@ -140,7 +140,7 @@ const DiscoverContent = () => {
             </>
           )}
         </h1>
-        <p className="text-slate-500 text-sm sm:text-base max-w-lg mx-auto mb-10">{heroSubtitle}</p>
+        <p className="text-slate-500 text-sm sm:text-base max-w-lg mx-auto mb-6 sm:mb-10 px-2">{heroSubtitle}</p>
 
         <div className="relative max-w-2xl mx-auto">
           <SearchBar
@@ -172,8 +172,8 @@ const DiscoverContent = () => {
 
       {!isLoading && query && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pb-2 border-b border-slate-100">
+            <h2 className="text-base sm:text-xl font-bold text-slate-900 line-clamp-2 sm:truncate">
               {inputSummary || formatDiscoverSummary(query, mode, locale)}
             </h2>
             <div className="flex items-center gap-2 shrink-0">

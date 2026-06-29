@@ -15,56 +15,34 @@ export const BottomTabBar = () => {
 
   if (currentTrack) return null;
 
-  const isDiscover = pathname.startsWith('/discover');
+  const isDiscover = pathname.startsWith('/discover') || pathname === '/';
   const isCreate = pathname.startsWith('/create');
   const isSaved = pathname.startsWith('/saved');
 
+  const tabClass = (active: boolean) =>
+    clsx(
+      'flex flex-col items-center justify-center w-full h-full gap-0.5 py-1',
+      active ? 'text-sky-600' : 'text-slate-400',
+    );
+
   return (
-    <div className="md:hidden fixed bottom-0 left-0 w-full h-14 bg-white/90 backdrop-blur-md border-t border-sky-100 flex items-center justify-around z-40 font-sans select-none">
-      <Link
-        href="/discover"
-        className="flex flex-col items-center justify-center w-full h-full gap-0.5"
-      >
-        <Music
-          className={clsx(
-            'w-5 h-5 transition-colors',
-            isDiscover ? 'text-sky-500' : 'text-slate-400',
-          )}
-        />
-        {isDiscover && (
-          <span className="text-[10px] font-semibold text-sky-600">Discover</span>
-        )}
-      </Link>
+    <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-sky-100 z-40 font-sans select-none sb-safe-bottom">
+      <div className="flex items-stretch justify-around h-14">
+        <Link href="/discover" className={tabClass(isDiscover)}>
+          <Music className={clsx('w-5 h-5', isDiscover && 'text-sky-500')} />
+          <span className="text-[10px] font-semibold">Discover</span>
+        </Link>
 
-      <Link
-        href="/create"
-        className="flex flex-col items-center justify-center w-full h-full gap-0.5"
-      >
-        <SlidersHorizontal
-          className={clsx(
-            'w-5 h-5 transition-colors',
-            isCreate ? 'text-sky-500' : 'text-slate-400',
-          )}
-        />
-        {isCreate && (
-          <span className="text-[10px] font-semibold text-sky-600">Create</span>
-        )}
-      </Link>
+        <Link href="/create" className={tabClass(isCreate)}>
+          <SlidersHorizontal className={clsx('w-5 h-5', isCreate && 'text-sky-500')} />
+          <span className="text-[10px] font-semibold">Create</span>
+        </Link>
 
-      <Link
-        href="/auth/login"
-        className="flex flex-col items-center justify-center w-full h-full gap-0.5"
-      >
-        <Heart
-          className={clsx(
-            'w-5 h-5 transition-colors',
-            isSaved ? 'text-sky-500' : 'text-slate-400',
-          )}
-        />
-        {isSaved && (
-          <span className="text-[10px] font-semibold text-sky-600">{t('tab_saved')}</span>
-        )}
-      </Link>
+        <Link href="/auth/login" className={tabClass(isSaved)}>
+          <Heart className={clsx('w-5 h-5', isSaved && 'text-sky-500')} />
+          <span className="text-[10px] font-semibold">{t('tab_saved')}</span>
+        </Link>
+      </div>
     </div>
   );
 };

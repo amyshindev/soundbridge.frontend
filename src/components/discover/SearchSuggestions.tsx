@@ -29,7 +29,7 @@ export const SearchSuggestions = ({
 
   return (
     <div
-      className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
+      className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[min(50vh,320px)] overflow-y-auto overscroll-contain rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
       role="listbox"
       aria-label="곡 검색 제안"
     >

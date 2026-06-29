@@ -61,23 +61,23 @@ export const ResultCard = ({
   return (
     <div
       className={clsx(
-        'bg-white rounded-3xl p-5 shadow-sm border border-sky-50/50 hover:shadow-md transition-shadow flex flex-col gap-5',
+        'bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-sm border border-sky-50/50 hover:shadow-md transition-shadow flex flex-col gap-4 sm:gap-5',
         className,
       )}
     >
-      <div className="flex gap-4 items-start">
-        <div className="relative group w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl overflow-hidden shadow-sm">
+      <div className="flex gap-3 sm:gap-4 items-start">
+        <div className="relative group w-16 h-16 sm:w-24 sm:h-24 shrink-0 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
           <TrackCover
             instrument={track.instrument}
             genre={track.genre}
             title={track.title}
-            className="w-full h-full rounded-2xl"
-            iconClassName="w-8 h-8"
+            className="w-full h-full rounded-xl sm:rounded-2xl"
+            iconClassName="w-7 h-7 sm:w-8 sm:h-8"
           />
           <button
             type="button"
             onClick={handlePlayToggle}
-            className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
           >
             <div
               className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg backdrop-blur-sm"
@@ -93,7 +93,7 @@ export const ResultCard = ({
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span
               className="px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold"
               style={genreTheme.badgeStyle}
@@ -101,6 +101,11 @@ export const ResultCard = ({
               {categoryLabel}
             </span>
             <span className="text-slate-400 text-xs">{track.bpm} BPM</span>
+            {score !== undefined && score > 0 && (
+              <span className="sm:hidden text-xs font-bold text-sky-500 ml-auto">
+                {Math.round(score)}% Match
+              </span>
+            )}
           </div>
           <h3 className="font-bold text-slate-900 text-base sm:text-lg truncate">
             {labelTrackTitle(locale, track.title, track.titleEn)}
@@ -151,7 +156,7 @@ export const ResultCard = ({
       {showExplanation && (
         <Link
           href={presetHref}
-          className="mt-1 w-full sm:w-auto self-end flex items-center justify-center gap-1.5 px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+          className="w-full flex items-center justify-center gap-1.5 px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
         >
           {t('result_create_bridge')}
           <ChevronRight size={16} />

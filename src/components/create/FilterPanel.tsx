@@ -150,7 +150,7 @@ export const FilterPanel = ({
   };
 
   return (
-    <div className="w-full lg:w-64 shrink-0 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+    <div className="w-full lg:w-64 shrink-0 bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
       {showPresetBanner && (
         <div className="mb-5 -mx-1">
           <PresetBanner preset={preset} onClose={onClosePresetBanner} />
@@ -162,7 +162,7 @@ export const FilterPanel = ({
         <span>필터</span>
       </div>
 
-      <div className="space-y-6 max-h-[70vh] overflow-y-auto scrollbar-thin pr-1">
+      <div className="space-y-6 max-h-none lg:max-h-[70vh] overflow-y-auto pr-1">
         <div>
           <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">
             {t('create_filter_type')}

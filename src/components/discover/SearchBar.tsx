@@ -202,7 +202,7 @@ export const SearchBar = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full flex flex-col items-center gap-4 ${isLarge ? 'max-w-2xl' : 'max-w-xl'}`}
+      className={`relative w-full flex flex-col items-center gap-3 sm:gap-4 ${isLarge ? 'max-w-2xl' : 'max-w-xl'}`}
     >
       {showModeToggle && (
         <SearchModeToggle mode={mode} onChange={handleModeChange} />
@@ -211,48 +211,50 @@ export const SearchBar = ({
       <div className="relative w-full">
         <form onSubmit={handleSubmit} className="relative w-full">
           <div
-            className={`relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-shadow focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${
+            className={`relative flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-shadow focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${
               isLarge ? 'p-2' : 'p-1.5'
             }`}
           >
-            <Search
-              className={`absolute text-slate-400 shrink-0 ${isLarge ? 'left-6' : 'left-4'}`}
-              size={isLarge ? 20 : 18}
-            />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setActiveIndex(-1);
-                if (mode === 'song') {
-                  setIsOpen(true);
-                }
-              }}
-              onFocus={() => {
-                if (mode === 'song') {
-                  setIsOpen(true);
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder={inputPlaceholder}
-              autoComplete="off"
-              maxLength={200}
-              role={mode === 'song' ? 'combobox' : undefined}
-              aria-expanded={mode === 'song' && isOpen && query.trim().length >= 1}
-              aria-autocomplete={mode === 'song' ? 'list' : undefined}
-              className={`w-full bg-transparent border-none focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium min-w-0 ${
-                isLarge
-                  ? 'pl-12 pr-4 py-4 text-base sm:text-lg'
-                  : 'pl-10 pr-3 py-3 text-sm sm:text-base'
-              }`}
-            />
+            <div className="relative flex items-center flex-1 min-w-0 w-full">
+              <Search
+                className={`absolute text-slate-400 shrink-0 ${isLarge ? 'left-4 sm:left-6' : 'left-3 sm:left-4'}`}
+                size={isLarge ? 20 : 18}
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActiveIndex(-1);
+                  if (mode === 'song') {
+                    setIsOpen(true);
+                  }
+                }}
+                onFocus={() => {
+                  if (mode === 'song') {
+                    setIsOpen(true);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder={inputPlaceholder}
+                autoComplete="off"
+                maxLength={200}
+                role={mode === 'song' ? 'combobox' : undefined}
+                aria-expanded={mode === 'song' && isOpen && query.trim().length >= 1}
+                aria-autocomplete={mode === 'song' ? 'list' : undefined}
+                className={`w-full bg-transparent border-none focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium min-w-0 ${
+                  isLarge
+                    ? 'pl-10 sm:pl-12 pr-3 py-3 sm:py-4 text-sm sm:text-lg'
+                    : 'pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base'
+                }`}
+              />
+            </div>
             <button
               type="submit"
               disabled={!canSubmit}
               aria-busy={isSearching}
-              className={`bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:hover:bg-sky-500 text-white rounded-xl font-semibold transition-colors shrink-0 flex items-center gap-2 ${
-                isLarge ? 'px-6 sm:px-8 py-3.5' : 'px-5 py-2.5 text-sm'
+              className={`w-full sm:w-auto bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:hover:bg-sky-500 text-white rounded-xl font-semibold transition-colors shrink-0 flex items-center justify-center gap-2 ${
+                isLarge ? 'px-6 sm:px-8 py-3 sm:py-3.5' : 'px-5 py-2.5 text-sm'
               }`}
             >
               {isSearching ? (

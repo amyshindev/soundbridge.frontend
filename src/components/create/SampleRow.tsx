@@ -81,7 +81,7 @@ export const SampleRow = ({ sample }: SampleRowProps) => {
         </div>
       </div>
 
-      <div className="flex-1 w-full h-12 relative flex items-center gap-[2px] opacity-60 group-hover:opacity-100 transition-opacity">
+      <div className="flex-1 w-full h-10 sm:h-12 relative flex items-center gap-[2px] opacity-80 sm:opacity-60 group-hover:opacity-100 transition-opacity overflow-hidden">
         {bars.map((h, i) => (
           <div
             key={i}
